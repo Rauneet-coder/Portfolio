@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { techData } from './data';
 import Terminal from './Terminal';
+
+import DraggableWindow from './components/DraggableWindow';
 import './App.css';
 
 function App() {
@@ -236,160 +238,19 @@ function App() {
       </div>
 
       {/* Windows Layer */}
+      {/* Windows Layer */}
       {openApps.map((app) => (
-        <div 
-          key={app.id}
-          className={`window-overlay ${!app.isMinimized ? 'open' : 'minimized'}`} 
-          style={{ zIndex: activeAppId === app.id ? 100 : 10 }}
-          onClick={(e) => {
-             // If clicking overlay (background), close window
-             if (e.target.className.includes('window-overlay')) handleClose(app.id);
-          }}
-        >
-          {/* Only render content if reasonable to avoid heavy DOM when minimized? 
-              Actually better to keep it for animation consistency usually, but hiding helps performance.
-              We keep it rendered for the shrink animation to work from CSS transform.
-          */}
-          <div className="window-container" style={{ '--accent-color': app.color }}>
-            <div className="window-header" onClick={() => setActiveAppId(app.id)}>
-              <div className="window-controls">
-                <span className="control close" onClick={(e) => { e.stopPropagation(); handleClose(app.id); }}></span>
-                <span className="control minimize" onClick={(e) => handleMinimize(e, app.id)}></span>
-                <span className="control maximize"></span>
-              </div>
-              <div className="window-title">
-                {app.id === 'terminal' ? 'visitor@rauneet-dev: ~' : `${app.name} — Preview Mode`}
-              </div>
-              <div className="window-actions">
-                 <span>▼</span>
-              </div>
-            </div>
-
-            {app.id === 'terminal' ? (
-                <Terminal onClose={() => handleClose(app.id)} isMinimized={app.isMinimized} />
-            ) : (
-                <div className="window-body">
-                <div className="window-sidebar">
-                    <div className="sidebar-header">
-                    <img src={app.icon} alt={app.name} className="sidebar-icon" />
-                    <h4>{app.name}</h4>
-                    </div>
-                    <nav className="window-nav">
-                    <button 
-                        className={`nav-item ${app.activeTab === 'projects' ? 'active' : ''}`}
-                        onClick={() => updateAppState(app.id, { activeTab: 'projects' })}
-                    >
-                        Video Previews
-                    </button>
-                    <button 
-                        className={`nav-item ${app.activeTab === 'journey' ? 'active' : ''}`}
-                        onClick={() => updateAppState(app.id, { activeTab: 'journey' })}
-                    >
-                        Documentary
-                    </button>
-                    <button 
-                        className={`nav-item ${app.activeTab === 'stack' ? 'active' : ''}`}
-                        onClick={() => updateAppState(app.id, { activeTab: 'stack' })}
-                    >
-                        Languages Learned
-                    </button>
-                    <button 
-                        className={`nav-item ${app.activeTab === 'learning' ? 'active' : ''}`}
-                        onClick={() => updateAppState(app.id, { activeTab: 'learning' })}
-                    >
-                        Currently Learning
-                    </button>
-                    </nav>
-                    <div className="sidebar-footer">
-                    <p>v1.0.0</p>
-                    </div>
-                </div>
-
-                <div className="window-content">
-                    {app.activeTab === 'projects' && (
-                    <div className="tab-content projects-view fade-in">
-                        <div className="content-header">
-                        <h3>// VIDEO_PREVIEWS</h3>
-                        <p>Running instances of {app.name} projects.</p>
-                        </div>
-                        <div className="projects-grid">
-                        {app.projects.map((project, idx) => (
-                            <div key={idx} className="project-card">
-                            <div className="video-container">
-                                <div className="video-overlay">► PLAY PREVIEW</div>
-                                <img src={project.video} alt={project.title} className="project-video-placeholder" />
-                            </div>
-                            <div className="project-details">
-                                <h4>{project.title}</h4>
-                                <p>{project.desc}</p>
-                                <div className="tags">
-                                {project.tech && project.tech.map(t => <span key={t} className="tag">{t}</span>)}
-                                </div>
-                            </div>
-                            </div>
-                        ))}
-                        </div>
-                    </div>
-                    )}
-
-                    {app.activeTab === 'journey' && (
-                    <div className="tab-content journey-view fade-in">
-                        <div className="content-header">
-                        <h3>// DOCUMENTATION_LOG</h3>
-                        <p>Timeline of {app.name} mastery.</p>
-                        </div>
-                        <div className="timeline">
-                        {app.journey.map((item, idx) => (
-                            <div key={idx} className="timeline-item">
-                            <div className="timeline-date">{item.date}</div>
-                            <div className="timeline-content">
-                                <h4>{item.title}</h4>
-                                <p>{item.desc}</p>
-                            </div>
-                            </div>
-                        ))}
-                        </div>
-                    </div>
-                    )}
-
-                    {app.activeTab === 'stack' && (
-                    <div className="tab-content stack-view fade-in">
-                        <div className="content-header">
-                        <h3>// LANGUAGES_LEARNED</h3>
-                        <p>Core technologies and tools in my {app.name} arsenal.</p>
-                        </div>
-                        <div className="tech-stack-grid">
-                        {app.stack ? app.stack.map((item, idx) => (
-                            <div key={idx} className="stack-item">
-                            {item}
-                            </div>
-                        )) : <p>No specific languages listed.</p>}
-                        </div>
-                    </div>
-                    )}
-
-                    {app.activeTab === 'learning' && (
-                    <div className="tab-content learning-view fade-in">
-                        <div className="content-header">
-                        <h3>// CURRENTLY_LEARNING</h3>
-                        <p>Future-proofing skills and technologies I am actively exploring.</p>
-                        </div>
-                        <div className="learning-list">
-                        {app.learning ? app.learning.map((item, idx) => (
-                            <div key={idx} className="learning-item">
-                            <h4>{item}</h4>
-                            <p>Expanding knowledge base to include {item} patterns and best practices.</p>
-                            <span className="learning-status">IN PROGRESS</span>
-                            </div>
-                        )) : <p>Open to new technologies.</p>}
-                        </div>
-                    </div>
-                    )}
-                </div>
-                </div>
-            )}
-          </div>
-        </div>
+        <DraggableWindow 
+            key={app.id}
+            app={app}
+            activeAppId={activeAppId}
+            setActiveAppId={setActiveAppId}
+            handleClose={handleClose}
+            handleMinimize={handleMinimize}
+            openTerminal={openTerminal} // Not strictly needed inside unless recursive? Actually updateAppState is needed!
+            updateAppState={updateAppState}
+            techData={techData}
+        />
       ))}
     {/* Contact Modal */}
       {isContactOpen && (
