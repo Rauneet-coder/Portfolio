@@ -922,3 +922,103 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Terminal Styles */
+.terminal-window-content {
+  background-color: #0c0c0c;
+  color: #33ff33;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 1rem;
+  height: 100%;
+  flex: 1;
+  /* Allow to grow */
+  overflow-y: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: text;
+  text-shadow: 0 0 5px rgba(51, 255, 51, 0.4);
+  /* Glow effect */
+}
+
+.terminal-history {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.line {
+  display: flex;
+  line-height: 1.5;
+}
+
+.line.command .prompt {
+  color: #33ff33;
+  font-weight: bold;
+}
+
+.line.system .output {
+  color: #888;
+}
+
+.output {
+  word-break: break-word;
+  white-space: pre-wrap;
+  opacity: 0.9;
+}
+
+.input-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prompt {
+  color: #33ff33;
+  white-space: nowrap;
+}
+
+.terminal-input {
+  background: transparent;
+  border: none;
+  color: #33ff33;
+  font-family: inherit;
+  font-size: inherit;
+  flex: 1;
+  outline: none;
+  caret-color: #33ff33;
+}
+
+/* Terminal Tables & Lists */
+.help-table {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 0.5rem;
+  color: #ccc;
+}
+
+.help-table td {
+  padding: 2px 0;
+}
+
+.help-table td:first-child {
+  color: #33ff33;
+  font-weight: bold;
+  width: 100px;
+}
+
+.terminal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.terminal-list li {
+  margin-bottom: 0.2rem;
+}
+
+/* Animations included in main css, but ensure they apply here too */
+.terminal-response {
+  animation: fadeIn 0.2s ease-out;
+}
