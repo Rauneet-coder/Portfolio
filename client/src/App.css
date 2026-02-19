@@ -156,34 +156,25 @@
   display: block;
 }
 
-/* Window Modal Overlay */
-.window-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  /* Overlay background is handled by main-content blur mostly, but fallback */
-  background: rgba(0, 0, 0, 0.4);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+/* Window Wrapper (Replaces Overlay for Draggable) */
+.window-wrapper {
+  position: absolute;
+  /* Draggable uses transform, but basic positioning helps initial centering */
+  top: 10%;
+  /* Initial placement */
+  left: 15%;
+  /* Initial placement - draggable will override via transform */
+  width: auto;
+  height: auto;
+  /* Remove flex centering since we want free movement */
 }
 
-.window-overlay.open {
-  opacity: 1;
-  visibility: visible;
-}
+/* We need distinct initial positions or random? For now fixed is fine, user drags them. */
 
 .window-container {
-  width: 100%;
-  max-width: 1000px;
-  height: 80vh;
+  width: 900px;
+  max-width: 90vw;
+  height: 70vh;
   background: #111;
   border: 1px solid #333;
   border-radius: 12px;
@@ -195,6 +186,17 @@
   /* Slight border glow based on tech color */
   border: 1px solid var(--accent-color, #333);
   box-shadow: 0 0 30px -10px var(--accent-color, transparent);
+  transition: width 0.3s, height 0.3s;
+  /* Smooth resizing if we added that */
+}
+
+.window-header {
+  cursor: grab;
+  /* Show grab cursor */
+}
+
+.window-header:active {
+  cursor: grabbing;
 }
 
 /* Window Header */
@@ -571,20 +573,21 @@
 }
 
 /* Minimized State Animation */
-.window-overlay {
-  transition: opacity 0.4s cubic-bezier(0.19, 1, 0.22, 1),
-    visibility 0.4s cubic-bezier(0.19, 1, 0.22, 1),
-    transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-  transform-origin: bottom center;
-}
-
-.window-overlay.minimized {
+/* Minimized State - Logic is handled by React state mainly now */
+.window-wrapper.minimized {
   opacity: 0;
   visibility: hidden;
-  /* Hide it but keep it technically mounted if we wanted, but logic handles mounting */
-  transform: scale(0.1) translateY(500px);
-  /* Suck into dock effect */
+  transform: scale(0.1) translateY(500px) !important;
+  /* Force override draggable transform? difficult with inline styles */
+  /* Actually, simpler: if minimized, display: none in JS or pointer-events none + opacity 0 */
   pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.window-wrapper.open {
+  opacity: 1;
+  visibility: visible;
+  /* transform is managed by react-draggable */
 }
 
 /* New Sections Styles */
