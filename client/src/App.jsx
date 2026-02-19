@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { techData } from './data';
+import Terminal from './Terminal';
 import './App.css';
 
 function App() {
@@ -27,6 +28,27 @@ function App() {
       };
       setOpenApps([...openApps, newApp]);
       setActiveAppId(tech.id);
+    }
+  };
+
+  const openTerminal = () => {
+    const terminalId = 'terminal';
+    const isAlreadyOpen = openApps.find(app => app.id === terminalId);
+
+    if (isAlreadyOpen) {
+        updateAppState(terminalId, { isMinimized: false });
+        setActiveAppId(terminalId);
+    } else {
+        const terminalApp = {
+            id: 'terminal',
+            name: 'Terminal',
+            icon: 'terminal-icon', // Marker for inline SVG
+            color: '#33ff33', // Traditional terminal green
+            isMinimized: false,
+            activeTab: 'cli' // Special tab identifier
+        };
+        setOpenApps([...openApps, terminalApp]);
+        setActiveAppId(terminalId);
     }
   };
 
@@ -181,10 +203,35 @@ function App() {
               onClick={() => handleDockClick(app.id)}
               title={app.name}
             >
-               <img src={app.icon} alt={app.name} className="dock-icon" />
+               {app.icon === 'terminal-icon' ? (
+                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dock-icon" style={{ color: '#fff' }}>
+                      <polyline points="4 17 10 11 4 5"></polyline>
+                      <line x1="12" y1="19" x2="20" y2="19"></line>
+                   </svg>
+               ) : (
+                   <img src={app.icon} alt={app.name} className="dock-icon" />
+               )}
                {!app.isMinimized && <div className="dock-dot"></div>}
             </div>
           ))}
+          {/* Always show Terminal in Dock if not open? Or maybe just a launcher button if we prefer. 
+              Let's add a permanent launcher for Terminal if it's not active? 
+              Actually, usually standard docks show pinned apps. Let's just add a launcher button 
+              that isn't part of openApps unless it IS open. But to keep it simple, let's 
+              add a standalone trigger in the dock for "New Terminal" if not present.
+           */}
+           {!openApps.find(a => a.id === 'terminal') && (
+               <div 
+                className="dock-item"
+                onClick={openTerminal}
+                title="Open Terminal"
+               >
+                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dock-icon" style={{ color: '#fff' }}>
+                      <polyline points="4 17 10 11 4 5"></polyline>
+                      <line x1="12" y1="19" x2="20" y2="19"></line>
+                   </svg>
+               </div>
+           )}
         </div>
       </div>
 
@@ -211,132 +258,136 @@ function App() {
                 <span className="control maximize"></span>
               </div>
               <div className="window-title">
-                {app.name} — Preview Mode
+                {app.id === 'terminal' ? 'visitor@rauneet-dev: ~' : `${app.name} — Preview Mode`}
               </div>
               <div className="window-actions">
                  <span>▼</span>
               </div>
             </div>
 
-            <div className="window-body">
-              <div className="window-sidebar">
-                <div className="sidebar-header">
-                  <img src={app.icon} alt={app.name} className="sidebar-icon" />
-                  <h4>{app.name}</h4>
-                </div>
-                <nav className="window-nav">
-                  <button 
-                    className={`nav-item ${app.activeTab === 'projects' ? 'active' : ''}`}
-                    onClick={() => updateAppState(app.id, { activeTab: 'projects' })}
-                  >
-                    Video Previews
-                  </button>
-                  <button 
-                    className={`nav-item ${app.activeTab === 'journey' ? 'active' : ''}`}
-                    onClick={() => updateAppState(app.id, { activeTab: 'journey' })}
-                  >
-                    Documentary
-                  </button>
-                  <button 
-                    className={`nav-item ${app.activeTab === 'stack' ? 'active' : ''}`}
-                    onClick={() => updateAppState(app.id, { activeTab: 'stack' })}
-                  >
-                    Languages Learned
-                  </button>
-                  <button 
-                    className={`nav-item ${app.activeTab === 'learning' ? 'active' : ''}`}
-                    onClick={() => updateAppState(app.id, { activeTab: 'learning' })}
-                  >
-                    Currently Learning
-                  </button>
-                </nav>
-                <div className="sidebar-footer">
-                  <p>v1.0.0</p>
-                </div>
-              </div>
-
-              <div className="window-content">
-                {app.activeTab === 'projects' && (
-                  <div className="tab-content projects-view fade-in">
-                    <div className="content-header">
-                      <h3>// VIDEO_PREVIEWS</h3>
-                      <p>Running instances of {app.name} projects.</p>
+            {app.id === 'terminal' ? (
+                <Terminal onClose={() => handleClose(app.id)} isMinimized={app.isMinimized} />
+            ) : (
+                <div className="window-body">
+                <div className="window-sidebar">
+                    <div className="sidebar-header">
+                    <img src={app.icon} alt={app.name} className="sidebar-icon" />
+                    <h4>{app.name}</h4>
                     </div>
-                    <div className="projects-grid">
-                      {app.projects.map((project, idx) => (
-                        <div key={idx} className="project-card">
-                          <div className="video-container">
-                            <div className="video-overlay">► PLAY PREVIEW</div>
-                            <img src={project.video} alt={project.title} className="project-video-placeholder" />
-                          </div>
-                          <div className="project-details">
-                            <h4>{project.title}</h4>
-                            <p>{project.desc}</p>
-                            <div className="tags">
-                              {project.tech && project.tech.map(t => <span key={t} className="tag">{t}</span>)}
+                    <nav className="window-nav">
+                    <button 
+                        className={`nav-item ${app.activeTab === 'projects' ? 'active' : ''}`}
+                        onClick={() => updateAppState(app.id, { activeTab: 'projects' })}
+                    >
+                        Video Previews
+                    </button>
+                    <button 
+                        className={`nav-item ${app.activeTab === 'journey' ? 'active' : ''}`}
+                        onClick={() => updateAppState(app.id, { activeTab: 'journey' })}
+                    >
+                        Documentary
+                    </button>
+                    <button 
+                        className={`nav-item ${app.activeTab === 'stack' ? 'active' : ''}`}
+                        onClick={() => updateAppState(app.id, { activeTab: 'stack' })}
+                    >
+                        Languages Learned
+                    </button>
+                    <button 
+                        className={`nav-item ${app.activeTab === 'learning' ? 'active' : ''}`}
+                        onClick={() => updateAppState(app.id, { activeTab: 'learning' })}
+                    >
+                        Currently Learning
+                    </button>
+                    </nav>
+                    <div className="sidebar-footer">
+                    <p>v1.0.0</p>
+                    </div>
+                </div>
+
+                <div className="window-content">
+                    {app.activeTab === 'projects' && (
+                    <div className="tab-content projects-view fade-in">
+                        <div className="content-header">
+                        <h3>// VIDEO_PREVIEWS</h3>
+                        <p>Running instances of {app.name} projects.</p>
+                        </div>
+                        <div className="projects-grid">
+                        {app.projects.map((project, idx) => (
+                            <div key={idx} className="project-card">
+                            <div className="video-container">
+                                <div className="video-overlay">► PLAY PREVIEW</div>
+                                <img src={project.video} alt={project.title} className="project-video-placeholder" />
                             </div>
-                          </div>
+                            <div className="project-details">
+                                <h4>{project.title}</h4>
+                                <p>{project.desc}</p>
+                                <div className="tags">
+                                {project.tech && project.tech.map(t => <span key={t} className="tag">{t}</span>)}
+                                </div>
+                            </div>
+                            </div>
+                        ))}
                         </div>
-                      ))}
                     </div>
-                  </div>
-                )}
+                    )}
 
-                {app.activeTab === 'journey' && (
-                   <div className="tab-content journey-view fade-in">
-                      <div className="content-header">
-                      <h3>// DOCUMENTATION_LOG</h3>
-                      <p>Timeline of {app.name} mastery.</p>
-                    </div>
-                    <div className="timeline">
-                      {app.journey.map((item, idx) => (
-                        <div key={idx} className="timeline-item">
-                          <div className="timeline-date">{item.date}</div>
-                          <div className="timeline-content">
-                            <h4>{item.title}</h4>
-                            <p>{item.desc}</p>
-                          </div>
+                    {app.activeTab === 'journey' && (
+                    <div className="tab-content journey-view fade-in">
+                        <div className="content-header">
+                        <h3>// DOCUMENTATION_LOG</h3>
+                        <p>Timeline of {app.name} mastery.</p>
                         </div>
-                      ))}
+                        <div className="timeline">
+                        {app.journey.map((item, idx) => (
+                            <div key={idx} className="timeline-item">
+                            <div className="timeline-date">{item.date}</div>
+                            <div className="timeline-content">
+                                <h4>{item.title}</h4>
+                                <p>{item.desc}</p>
+                            </div>
+                            </div>
+                        ))}
+                        </div>
                     </div>
-                   </div>
-                )}
+                    )}
 
-                {app.activeTab === 'stack' && (
-                  <div className="tab-content stack-view fade-in">
-                    <div className="content-header">
-                      <h3>// LANGUAGES_LEARNED</h3>
-                      <p>Core technologies and tools in my {app.name} arsenal.</p>
-                    </div>
-                    <div className="tech-stack-grid">
-                      {app.stack ? app.stack.map((item, idx) => (
-                        <div key={idx} className="stack-item">
-                          {item}
+                    {app.activeTab === 'stack' && (
+                    <div className="tab-content stack-view fade-in">
+                        <div className="content-header">
+                        <h3>// LANGUAGES_LEARNED</h3>
+                        <p>Core technologies and tools in my {app.name} arsenal.</p>
                         </div>
-                      )) : <p>No specific languages listed.</p>}
+                        <div className="tech-stack-grid">
+                        {app.stack ? app.stack.map((item, idx) => (
+                            <div key={idx} className="stack-item">
+                            {item}
+                            </div>
+                        )) : <p>No specific languages listed.</p>}
+                        </div>
                     </div>
-                  </div>
-                )}
+                    )}
 
-                {app.activeTab === 'learning' && (
-                  <div className="tab-content learning-view fade-in">
-                     <div className="content-header">
-                      <h3>// CURRENTLY_LEARNING</h3>
-                      <p>Future-proofing skills and technologies I am actively exploring.</p>
-                    </div>
-                    <div className="learning-list">
-                      {app.learning ? app.learning.map((item, idx) => (
-                        <div key={idx} className="learning-item">
-                          <h4>{item}</h4>
-                          <p>Expanding knowledge base to include {item} patterns and best practices.</p>
-                          <span className="learning-status">IN PROGRESS</span>
+                    {app.activeTab === 'learning' && (
+                    <div className="tab-content learning-view fade-in">
+                        <div className="content-header">
+                        <h3>// CURRENTLY_LEARNING</h3>
+                        <p>Future-proofing skills and technologies I am actively exploring.</p>
                         </div>
-                      )) : <p>Open to new technologies.</p>}
+                        <div className="learning-list">
+                        {app.learning ? app.learning.map((item, idx) => (
+                            <div key={idx} className="learning-item">
+                            <h4>{item}</h4>
+                            <p>Expanding knowledge base to include {item} patterns and best practices.</p>
+                            <span className="learning-status">IN PROGRESS</span>
+                            </div>
+                        )) : <p>Open to new technologies.</p>}
+                        </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </div>
+                    )}
+                </div>
+                </div>
+            )}
           </div>
         </div>
       ))}
