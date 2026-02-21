@@ -147,6 +147,7 @@ function App() {
           <div className="status-item clock">
             {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
+          {/* Toggle contact modal on click */}
           <button className="contact-btn" onClick={() => setIsContactOpen(true)}>
             Contact
           </button>
