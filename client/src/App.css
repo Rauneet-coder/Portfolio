@@ -48,7 +48,7 @@
   letter-spacing: -2px;
   margin: 0;
   text-transform: uppercase;
-  background: linear-gradient(90deg, #fff, #aaa);
+  background: linear-gradient(90deg, #fff, #00ff80);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
