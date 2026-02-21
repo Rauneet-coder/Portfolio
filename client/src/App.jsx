@@ -192,7 +192,7 @@ function App() {
         </section>
 
         <footer className="footer">
-          <p>© 2026 Rauneet Singh. Built with React.</p>
+          <p>© {new Date().getFullYear()} Rauneet Singh. Designed for Excellence.</p>
         </footer>
       </main>
 
