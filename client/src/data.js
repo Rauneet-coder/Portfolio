@@ -79,7 +79,7 @@ export const techData = [
       },
     ],
     stack: ["Node.js", "Express", "MongoDB", "PostgreSQL", "Redis", "Socket.io", "JWT"],
-    learning: ["GraphQL", "NestJS", "Microservices"],
+    learning: ["GraphQL", "NestJS", "Microservices", "Supabase"],
   },
   {
     id: "systems",
