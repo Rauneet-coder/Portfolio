@@ -224,13 +224,15 @@ function App() {
           <motion.div 
             className="tech-grid"
             initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
+            animate="show" // Changed from whileInView to animate for sequential load
             variants={{
               hidden: { opacity: 0 },
               show: {
                 opacity: 1,
-                transition: { staggerChildren: 0.1 }
+                transition: { 
+                  staggerChildren: 0.15,
+                  delayChildren: 1.8 // Wait for Hero animation to complete
+                }
               }
             }}
           >
@@ -242,8 +244,17 @@ function App() {
                 onMouseEnter={playHoverSound}
                 style={{ '--tech-color': tech.color }}
                 variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  show: { opacity: 1, y: 0 }
+                  hidden: { opacity: 0, scale: 0.8, y: 20 },
+                  show: { 
+                    opacity: 1, 
+                    scale: 1, 
+                    y: 0,
+                    transition: {
+                      type: "spring",
+                      stiffness: 100,
+                      damping: 12
+                    }
+                  }
                 }}
                 whileHover={{ 
                   scale: 1.05, 
