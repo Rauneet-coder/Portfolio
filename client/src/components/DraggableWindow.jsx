@@ -11,10 +11,12 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
     return (
         <Rnd
             size={app.isMaximized ? {
-                width: window.innerWidth,
-                height: window.innerHeight - 32
+                width: '100vw',
+                height: 'calc(100vh - 32px)'
             } : undefined}
             position={app.isMaximized ? { x: 0, y: 32 } : undefined}
+            maxWidth={app.isMaximized ? '100vw' : undefined}
+            maxHeight={app.isMaximized ? 'calc(100vh - 32px)' : undefined}
             default={{
                 x: initialX,
                 y: initialY,
@@ -25,7 +27,7 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
             enableResizing={!app.isMaximized}
             minWidth={320}
             minHeight={200}
-            bounds=".app-container"
+            bounds="window"
             dragHandleClassName="window-header"
             onDragStart={() => setActiveAppId(app.id)}
             onResizeStart={() => setActiveAppId(app.id)}

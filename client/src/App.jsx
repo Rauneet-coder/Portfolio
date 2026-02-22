@@ -31,6 +31,7 @@ function App() {
         ...tech, 
         instanceId: Date.now(), 
         isMinimized: false,
+        isMaximized: false,
         activeTab: 'projects' 
       };
       setOpenApps([...openApps, newApp]);
@@ -52,6 +53,7 @@ function App() {
             icon: 'terminal-icon', // Marker for inline SVG
             color: '#33ff33', // Traditional terminal green
             isMinimized: false,
+            isMaximized: false,
             activeTab: 'cli' // Special tab identifier
         };
         setOpenApps([...openApps, terminalApp]);
@@ -72,6 +74,14 @@ function App() {
     if (activeAppId === appId) {
       setActiveAppId(null);
     }
+  };
+
+  const handleMaximize = (e, appId) => {
+    if (e) e.stopPropagation();
+    const app = openApps.find(a => a.id === appId);
+    if (!app) return;
+    updateAppState(appId, { isMaximized: !app.isMaximized, isMinimized: false });
+    setActiveAppId(appId);
   };
 
   const handleDockClick = (appId) => {
@@ -258,6 +268,7 @@ function App() {
             setActiveAppId={setActiveAppId}
             handleClose={handleClose}
             handleMinimize={handleMinimize}
+            handleMaximize={handleMaximize}
             openTerminal={openTerminal} // Not strictly needed inside unless recursive? Actually updateAppState is needed!
             updateAppState={updateAppState}
             techData={techData}
