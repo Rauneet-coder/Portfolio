@@ -787,6 +787,13 @@
   width: 30px;
   height: 30px;
   object-fit: contain;
+  color: #fff;
+  /* Default for dark mode */
+}
+
+.light-theme .dock-icon {
+  color: #1d1d1f;
+  /* Dark for recruiter mode */
 }
 
 .dock-dot {
