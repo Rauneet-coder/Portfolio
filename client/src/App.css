@@ -430,6 +430,12 @@
   max-width: none !important;
 }
 
+.window-wrapper.maximized {
+  transform: translate(0px, 32px) !important;
+  width: 100vw !important;
+  height: calc(100vh - 32px) !important;
+}
+
 .window-header {
   cursor: grab;
   /* Show grab cursor */
