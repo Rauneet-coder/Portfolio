@@ -497,8 +497,8 @@
 /* Sidebar */
 .window-sidebar {
   width: 250px;
-  background: #161616;
-  border-right: 1px solid #333;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -558,7 +558,7 @@
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
-  background: #0f0f0f;
+  background: var(--content-bg);
 }
 
 .content-header h3 {

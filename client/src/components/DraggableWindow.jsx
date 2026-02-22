@@ -34,12 +34,13 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
                 className={`window-container ${app.isMinimized ? 'minimized-window' : ''}`}
                 style={{
                     '--accent-color': app.id === 'terminal' ? '#33ff33' : app.color,
-                    background: '#0c0c0c',
+                    background: 'var(--window-bg)',
                     width: '100%',
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    alignItems: 'stretch'
                 }}
             >
                 <div className="window-header">
