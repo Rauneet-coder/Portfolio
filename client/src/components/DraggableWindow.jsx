@@ -4,9 +4,9 @@ import Terminal from '../Terminal';
 
 const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handleMinimize, updateAppState }) => {
     
-    // Calculate random initial position for "stacking" effect
-    const initialX = 50 + (Math.random() * 50);
-    const initialY = 50 + (Math.random() * 50);
+    // Center the window on the screen by default
+    const initialX = typeof window !== 'undefined' ? (window.innerWidth - 900) / 2 + (Math.random() * 40 - 20) : 50;
+    const initialY = typeof window !== 'undefined' ? (window.innerHeight - 600) / 2 + (Math.random() * 40 - 20) : 50;
 
     return (
         <Rnd

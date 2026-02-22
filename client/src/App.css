@@ -428,19 +428,23 @@
 
 /* Window Header */
 .window-header {
+  width: 100%;
   height: 40px;
-  background: #1a1a1a;
-  border-bottom: 1px solid #333;
-  display: flex;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: grid;
+  grid-template-columns: 120px 1fr 120px;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 1rem;
+  padding: 0 1.2rem;
   user-select: none;
+  box-sizing: border-box;
 }
 
 .window-controls {
   display: flex;
   gap: 8px;
+  justify-self: start;
+  align-items: center;
 }
 
 .control {
@@ -463,16 +467,24 @@
 }
 
 .window-title {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #888;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-self: center;
 }
 
 .window-actions {
-  width: 40px;
-  /* Spacer to center title */
-  text-align: right;
   color: #666;
+  text-align: right;
+  font-size: 0.8rem;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 /* Window Body */
@@ -566,7 +578,7 @@
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .project-card {
@@ -897,11 +909,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
   box-sizing: border-box;
-  /* Ensure padding is included in width */
-  padding: 0 1rem;
-  /* Reduce side padding slightly */
   z-index: 2000;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 0.85rem;
@@ -1196,33 +1205,85 @@
 }
 
 /* Terminal Styles */
+/* Terminal Styles */
 .terminal-window-content {
   background-color: #0c0c0c;
   color: #33ff33;
-  font-family: 'Courier New', Courier, monospace;
-  padding: 1rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  padding: 2rem;
   height: 100%;
   flex: 1;
-  /* Allow to grow */
   overflow-y: auto;
   width: 100%;
   display: flex;
   flex-direction: column;
   cursor: text;
   text-shadow: 0 0 5px rgba(51, 255, 51, 0.4);
-  /* Glow effect */
+  position: relative;
+  transition: background-color 0.3s, color 0.3s;
+  box-sizing: border-box;
+}
+
+/* CRT Scanline Effect for Dark Mode */
+.terminal-window-content::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 118, 0.03));
+  z-index: 2;
+  background-size: 100% 3px, 3px 100%;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Recruiter Mode Terminal - Light variant */
+.light-theme .terminal-window-content {
+  background-color: #ffffff;
+  color: #1d1d1f;
+  text-shadow: none;
+}
+
+.light-theme .terminal-window-content::before {
+  display: none;
+  /* No CRT in recruiter mode */
+}
+
+/* Custom Scrollbar for Terminal */
+.terminal-window-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-window-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.terminal-window-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.light-theme .terminal-window-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .terminal-history {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.8rem;
+  z-index: 1;
 }
 
 .line {
   display: flex;
-  line-height: 1.5;
+  flex-direction: column;
+  /* Stack command and response for better flow */
+  line-height: 1.6;
 }
 
 .line.command .prompt {
@@ -1230,36 +1291,50 @@
   font-weight: bold;
 }
 
+.light-theme .line.command .prompt {
+  color: #0066cc;
+}
+
 .line.system .output {
   color: #888;
+  font-style: italic;
+  font-size: 0.85rem;
 }
 
 .output {
   word-break: break-word;
   white-space: pre-wrap;
   opacity: 0.9;
+  margin-top: 0.2rem;
 }
 
 .input-line {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
+  z-index: 2;
+  margin-top: 0.5rem;
 }
 
 .prompt {
   color: #33ff33;
   white-space: nowrap;
+  font-weight: bold;
+}
+
+.light-theme .prompt {
+  color: #0066cc;
 }
 
 .terminal-input {
   background: transparent;
   border: none;
-  color: #33ff33;
+  color: inherit;
   font-family: inherit;
-  font-size: inherit;
+  font-size: 1rem;
   flex: 1;
   outline: none;
-  caret-color: #33ff33;
+  caret-color: var(--accent-color);
 }
 
 /* Terminal Tables & Lists */
@@ -1302,7 +1377,7 @@
   border-top: 1px dashed var(--border-color);
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1.2rem;
 }
 
 .deep-dive-item {
