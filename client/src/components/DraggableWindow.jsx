@@ -11,8 +11,8 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
     return (
         <Rnd
             size={app.isMaximized ? {
-                width: '100vw',
-                height: 'calc(100vh - 32px)'
+                width: window.innerWidth,
+                height: window.innerHeight - 32
             } : undefined}
             position={app.isMaximized ? { x: 0, y: 32 } : undefined}
             default={{
