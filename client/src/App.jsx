@@ -11,6 +11,11 @@ function App() {
   const [activeAppId, setActiveAppId] = useState(null);
 
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   const handleTechClick = (tech) => {
     // Check if already open
@@ -125,7 +130,7 @@ function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${theme === 'light' ? 'light-theme' : ''}`}>
       {/* Background Elements */}
       <div className="bg-grid"></div>
       <div className="bg-glow"></div>
@@ -147,6 +152,11 @@ function App() {
           <div className="status-item clock">
             {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
+          
+          <button className="theme-toggle-btn" onClick={toggleTheme} title="Toggle Recruiter Mode">
+            {theme === 'dark' ? '👨‍💼 Recruiter Mode' : '💻 Developer Mode'}
+          </button>
+
           {/* Toggle contact modal on click */}
           <button className="contact-btn" onClick={() => setIsContactOpen(true)}>
             Contact
