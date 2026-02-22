@@ -226,28 +226,7 @@
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-.bg-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image:
-    linear-gradient(rgba(0, 255, 128, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 128, 0.03) 1px, transparent 1px);
-  background-size: 30px 30px;
-  pointer-events: none;
-}
-
-.bg-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 50vw;
-  height: 50vh;
-  background: radial-gradient(circle, rgba(0, 255, 136, 0.15) 0%, transparent 70%);
-  transform: translate(-50%, -50%);
-  z-index: 0;
+.scene-background {
   pointer-events: none;
 }
 

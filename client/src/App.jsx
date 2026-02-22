@@ -4,6 +4,8 @@ import { techData } from './data';
 import Terminal from './Terminal';
 
 import DraggableWindow from './components/DraggableWindow';
+import BackgroundScene from './components/BackgroundScene';
+import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
 
 function App() {
@@ -141,9 +143,8 @@ function App() {
 
   return (
     <div className={`app-container ${theme === 'light' ? 'light-theme' : ''}`}>
-      {/* Background Elements */}
-      <div className="bg-grid"></div>
-      <div className="bg-glow"></div>
+      {/* 3D Interactive Background */}
+      <BackgroundScene theme={theme} />
 
       {/* Top Status Bar */}
       <header className="status-bar">
@@ -177,25 +178,79 @@ function App() {
       {/* Main Content - Only blur if there is an active, non-minimized window */}
       <main className={`main-content ${activeAppId ? 'blur-background' : ''}`} style={{ paddingTop: '60px' }}>
         <header className="hero">
-          <div className="hero-content">
-            <h1 className="glitch" data-text="RAUNEET SINGH">RAUNEET SINGH</h1>
-            <p className="subtitle">BACKEND & DEVOPS ENGINEER</p>
-            <div className="status-line">
+          <motion.div 
+            className="hero-content"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          >
+            <motion.h1 
+              className="glitch" 
+              data-text="RAUNEET SINGH"
+              initial={{ letterSpacing: "0.2em", filter: "blur(10px)" }}
+              animate={{ letterSpacing: "0.05em", filter: "blur(0px)" }}
+              transition={{ duration: 1.5, ease: "anticipate" }}
+            >
+              RAUNEET SINGH
+            </motion.h1>
+            <motion.p 
+              className="subtitle"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 1 }}
+            >
+              BACKEND & DEVOPS ENGINEER
+            </motion.p>
+            <motion.div 
+              className="status-line"
+              initial={{ width: 0 }}
+              animate={{ width: "fit-content" }}
+              transition={{ delay: 1, duration: 0.8 }}
+              style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
+            >
               <span className="blink">_</span> SYSTEM: ONLINE
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </header>
 
         <section className="tech-grid-section">
-          <h2>// SELECT_MODULE</h2>
-          <div className="tech-grid">
+          <motion.h2
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            // SELECT_MODULE
+          </motion.h2>
+          <motion.div 
+            className="tech-grid"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: { staggerChildren: 0.1 }
+              }
+            }}
+          >
             {techData.map((tech) => (
-              <button
+              <motion.button
                 key={tech.id}
                 className="tech-card"
                 onClick={() => handleTechClick(tech)}
                 onMouseEnter={playHoverSound}
                 style={{ '--tech-color': tech.color }}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  show: { opacity: 1, y: 0 }
+                }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  y: -5,
+                  boxShadow: `0 0 20px -5px ${tech.color}` 
+                }}
+                whileTap={{ scale: 0.95 }}
               >
                 <div className="tech-icon-container">
                   <img src={tech.icon} alt={tech.name} className="tech-icon" onError={(e) => {e.target.style.display='none'}} />
@@ -206,9 +261,9 @@ function App() {
                   <span className="tech-role">{tech.role || "Technology"}</span>
                 </div>
                 <div className="card-border"></div>
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
         </section>
 
         <footer className="footer">
