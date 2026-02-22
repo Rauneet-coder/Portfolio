@@ -116,6 +116,23 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
                                                     <div className="tags">
                                                         {project.tech && project.tech.map(t => <span key={t} className="tag">{t}</span>)}
                                                     </div>
+
+                                                    {project.deepDive && (
+                                                        <div className="deep-dive-section">
+                                                            <div className="deep-dive-item">
+                                                                <span className="dd-label">Challenge:</span>
+                                                                <span className="dd-value">{project.deepDive.challenge}</span>
+                                                            </div>
+                                                            <div className="deep-dive-item">
+                                                                <span className="dd-label">Solution:</span>
+                                                                <span className="dd-value">{project.deepDive.solution}</span>
+                                                            </div>
+                                                            <div className="deep-dive-item">
+                                                                <span className="dd-label">Impact:</span>
+                                                                <span className="dd-value">{project.deepDive.impact}</span>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
