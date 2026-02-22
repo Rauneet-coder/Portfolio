@@ -2,7 +2,7 @@ import React from 'react';
 import { Rnd } from 'react-rnd';
 import Terminal from '../Terminal';
 
-const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handleMinimize, updateAppState }) => {
+const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handleMinimize, handleMaximize, updateAppState }) => {
     
     // Center the window on the screen by default
     const initialX = typeof window !== 'undefined' ? (window.innerWidth - 900) / 2 + (Math.random() * 40 - 20) : 50;
@@ -10,28 +10,35 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
 
     return (
         <Rnd
+            size={app.isMaximized ? {
+                width: '100vw',
+                height: 'calc(100vh - 32px)'
+            } : undefined}
+            position={app.isMaximized ? { x: 0, y: 32 } : undefined}
             default={{
                 x: initialX,
                 y: initialY,
                 width: 900,
                 height: 600,
             }}
+            disableDragging={app.isMaximized}
+            enableResizing={!app.isMaximized}
             minWidth={320}
             minHeight={200}
-            bounds="window"
+            bounds=".app-container"
             dragHandleClassName="window-header"
             onDragStart={() => setActiveAppId(app.id)}
             onResizeStart={() => setActiveAppId(app.id)}
             style={{
-                zIndex: activeAppId === app.id ? 100 : 10,
+                zIndex: activeAppId === app.id ? 2000 : 1000,
                 display: app.isMinimized ? 'none' : 'flex',
                 position: 'fixed'
             }}
-            className={`window-wrapper ${!app.isMinimized ? 'open' : 'minimized'}`}
+            className={`window-wrapper ${!app.isMinimized ? 'open' : 'minimized'} ${app.isMaximized ? 'maximized' : ''}`}
             onClick={() => setActiveAppId(app.id)}
         >
             <div
-                className={`window-container ${app.isMinimized ? 'minimized-window' : ''}`}
+                className={`window-container ${app.isMinimized ? 'minimized-window' : ''} ${app.isMaximized ? 'maximized' : ''}`}
                 style={{
                     '--accent-color': app.id === 'terminal' ? '#33ff33' : app.color,
                     background: 'var(--window-bg)',
@@ -47,7 +54,7 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
                     <div className="window-controls">
                         <span className="control close" onClick={(e) => { e.stopPropagation(); handleClose(app.id); }}></span>
                         <span className="control minimize" onClick={(e) => handleMinimize(e, app.id)}></span>
-                        <span className="control maximize"></span>
+                        <span className="control maximize" onClick={(e) => handleMaximize(e, app.id)}></span>
                     </div>
                     <div className="window-title">
                         {app.id === 'terminal' ? 'visitor@rauneet-dev: ~' : `${app.name} — Preview Mode`}
