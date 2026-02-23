@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { techData } from './data';
-import Terminal from './Terminal';
+const Terminal = React.lazy(() => import('./Terminal'));
+const DraggableWindow = React.lazy(() => import('./components/DraggableWindow'));
+const BackgroundScene = React.lazy(() => import('./components/BackgroundScene'));
 
-import DraggableWindow from './components/DraggableWindow';
-import BackgroundScene from './components/BackgroundScene';
 import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
 
@@ -144,7 +144,10 @@ function App() {
   return (
     <div className={`app-container ${theme === 'light' ? 'light-theme' : ''}`}>
       {/* 3D Interactive Background */}
-      <BackgroundScene theme={theme} />
+      <React.Suspense fallback={<div className="scene-fallback" style={{ background: theme === 'light' ? '#f5f5f7' : '#050505', position: 'fixed', inset: 0, zIndex: -1 }} />}>
+        <BackgroundScene theme={theme} />
+      </React.Suspense>
+
 
       {/* Top Status Bar */}
       <header className="status-bar">
@@ -326,20 +329,23 @@ function App() {
 
       {/* Windows Layer */}
       {/* Windows Layer */}
-      {openApps.map((app) => (
-        <DraggableWindow 
-            key={app.id}
-            app={app}
-            activeAppId={activeAppId}
-            setActiveAppId={setActiveAppId}
-            handleClose={handleClose}
-            handleMinimize={handleMinimize}
-            handleMaximize={handleMaximize}
-            openTerminal={openTerminal} // Not strictly needed inside unless recursive? Actually updateAppState is needed!
-            updateAppState={updateAppState}
-            techData={techData}
-        />
-      ))}
+      <React.Suspense fallback={null}>
+        {openApps.map((app) => (
+          <DraggableWindow 
+              key={app.id}
+              app={app}
+              activeAppId={activeAppId}
+              setActiveAppId={setActiveAppId}
+              handleClose={handleClose}
+              handleMinimize={handleMinimize}
+              handleMaximize={handleMaximize}
+              openTerminal={openTerminal}
+              updateAppState={updateAppState}
+              techData={techData}
+          />
+        ))}
+      </React.Suspense>
+
     {/* Contact Modal */}
       {isContactOpen && (
         <div className="modal-overlay" onClick={() => setIsContactOpen(false)}>
