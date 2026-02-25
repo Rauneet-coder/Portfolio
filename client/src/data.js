@@ -221,6 +221,6 @@ export const techData = [
       },
     ],
     stack: ["Docker", "Kubernetes", "AWS", "Linux", "Git", "GitHub Actions", "Shell Scripting", "Observability (Prometheus/Grafana)"],
-    learning: ["Terraform", "Jenkins(CI&CD)", "Anisible", "ArgoCD",],
+    learning: ["Terraform", "Jenkins (CI/CD)", "Ansible", "ArgoCD",],
   },
 ];
