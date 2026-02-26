@@ -1,0 +1,39 @@
+/* Global cursor override for desktop */
+@media (pointer: fine) {
+    * {
+        cursor: none !important;
+    }
+}
+
+.custom-cursor-container {
+    pointer-events: none;
+    z-index: 10000;
+    position: fixed;
+    inset: 0;
+}
+
+.cursor-dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.cursor-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    border: 1px solid;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.light-cursor .cursor-ring {
+    border-color: rgba(0, 102, 204, 0.5) !important;
+}
