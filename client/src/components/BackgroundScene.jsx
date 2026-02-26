@@ -1,33 +1,32 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
-import * as random from 'maath/random/dist/maath-random.esm';
+import { Icosahedron, Edges } from '@react-three/drei';
 
-function ParticleField(props) {
+function CyberCore({ color, cpuUsage }) {
   const ref = useRef();
-  const sphere = useMemo(() => random.inSphere(new Float32Array(5000), { radius: 1.5 }), []);
+  
+  // Base rotation speed based on CPU usage (e.g. 5% to 100% -> scale to rotation speed)
+  const speed = (cpuUsage / 100) * 1.5 + 0.2;
 
   useFrame((state, delta) => {
-    ref.current.rotation.x -= delta / 15;
-    ref.current.rotation.y -= delta / 20;
+    ref.current.rotation.x += delta * speed * 0.5;
+    ref.current.rotation.y += delta * speed * 0.7;
+    
+    // Slight pulse based on time and cpu intensity
+    const intensity = cpuUsage > 50 ? (cpuUsage - 50) / 10 : 1; 
+    const scale = 1.2 + Math.sin(state.clock.elapsedTime * 3) * 0.03 * intensity;
+    ref.current.scale.set(scale, scale, scale);
   });
 
   return (
-    <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
-        <PointMaterial
-          transparent
-          color="#00ff80"
-          size={0.003}
-          sizeAttenuation={true}
-          depthWrite={false}
-        />
-      </Points>
-    </group>
+    <Icosahedron args={[1, 1]} ref={ref}>
+      <meshBasicMaterial color={color} transparent opacity={0.1} wireframe={false} />
+      <Edges scale={1.05} threshold={15} color={color} />
+    </Icosahedron>
   );
 }
 
-const BackgroundScene = ({ theme }) => {
+const BackgroundScene = ({ theme, cpuUsage = 10 }) => {
   const accentColor = theme === 'light' ? '#0066cc' : '#00ff80';
   const bgColor = theme === 'light' ? '#f5f5f7' : '#050505';
 
@@ -43,8 +42,9 @@ const BackgroundScene = ({ theme }) => {
       background: bgColor,
       transition: 'background 0.5s ease'
     }}>
-      <Canvas camera={{ position: [0, 0, 1] }}>
-        <ParticleField color={accentColor} />
+      <Canvas camera={{ position: [0, 0, 4] }}>
+        <ambientLight intensity={0.5} />
+        <CyberCore color={accentColor} cpuUsage={cpuUsage} />
       </Canvas>
     </div>
   );
