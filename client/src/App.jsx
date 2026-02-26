@@ -4,6 +4,8 @@ import { techData } from './data';
 const Terminal = React.lazy(() => import('./Terminal'));
 const DraggableWindow = React.lazy(() => import('./components/DraggableWindow'));
 const BackgroundScene = React.lazy(() => import('./components/BackgroundScene'));
+import BootSequence from './components/BootSequence';
+import CustomCursor from './components/CustomCursor';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
@@ -11,6 +13,7 @@ import './App.css';
 function App() {
   const [openApps, setOpenApps] = useState([]);
   const [activeAppId, setActiveAppId] = useState(null);
+  const [hasBooted, setHasBooted] = useState(false);
 
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
@@ -161,9 +164,12 @@ function App() {
 
   return (
     <div className={`app-container ${theme === 'light' ? 'light-theme' : ''}`}>
+      <CustomCursor theme={theme} />
+      {!hasBooted && <BootSequence onComplete={() => setHasBooted(true)} />}
+
       {/* 3D Interactive Background */}
       <React.Suspense fallback={<div className="scene-fallback" style={{ background: theme === 'light' ? '#f5f5f7' : '#050505', position: 'fixed', inset: 0, zIndex: -1 }} />}>
-        <BackgroundScene theme={theme} />
+        <BackgroundScene theme={theme} cpuUsage={cpuUsage} />
       </React.Suspense>
 
 
