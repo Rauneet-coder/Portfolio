@@ -1,0 +1,39 @@
+.boot-container {
+    position: fixed;
+    inset: 0;
+    background-color: #050505;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5vw;
+    font-family: 'Courier New', Courier, monospace;
+    color: #00ff80;
+    text-shadow: 0 0 8px rgba(0, 255, 128, 0.4);
+    pointer-events: none;
+    /* so it doesn't block clicks if transparent */
+    /* Cyberpunk CRT overlay */
+    background-image: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.25) 50%);
+    background-size: 100% 4px;
+}
+
+.boot-terminal {
+    max-width: 800px;
+    width: 100%;
+}
+
+.boot-line {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    margin-bottom: 0.8rem;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.boot-cursor {
+    display: inline-block;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    margin-top: 0.5rem;
+    font-weight: bold;
+}
