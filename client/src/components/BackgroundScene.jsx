@@ -2,27 +2,60 @@ import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Icosahedron, Edges } from '@react-three/drei';
 
+import { useSpring, a } from '@react-spring/three';
+import { useEffect, useState } from 'react';
+
 function CyberCore({ color, cpuUsage }) {
   const ref = useRef();
   
-  // Base rotation speed based on CPU usage (e.g. 5% to 100% -> scale to rotation speed)
+  // Track dragging position
+  const [targetRot, setTargetRot] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleDrag = (e) => {
+      // Map screen coordinates to rotation targets
+      const { x, y } = e.detail;
+      const rotY = (x / window.innerWidth) * Math.PI - Math.PI / 2;
+      const rotX = (y / window.innerHeight) * Math.PI - Math.PI / 2;
+      setTargetRot({ x: rotX, y: rotY });
+    };
+
+    window.addEventListener('window-drag', handleDrag);
+    return () => window.removeEventListener('window-drag', handleDrag);
+  }, []);
+
+  // Smooth interpolation using react-spring
+  const { rotation, scaleSpring } = useSpring({
+    rotation: [targetRot.x, targetRot.y, 0],
+    scaleSpring: cpuUsage > 50 ? 1.4 : 1.2,
+    config: { mass: 2, tension: 170, friction: 50 }
+  });
+
+  // Base rotation speed based on CPU usage
   const speed = (cpuUsage / 100) * 1.5 + 0.2;
 
   useFrame((state, delta) => {
-    ref.current.rotation.x += delta * speed * 0.5;
-    ref.current.rotation.y += delta * speed * 0.7;
-    
-    // Slight pulse based on time and cpu intensity
-    const intensity = cpuUsage > 50 ? (cpuUsage - 50) / 10 : 1; 
-    const scale = 1.2 + Math.sin(state.clock.elapsedTime * 3) * 0.03 * intensity;
-    ref.current.scale.set(scale, scale, scale);
+    // Add constant rotation on top of the dragged target rotation
+    if (ref.current) {
+      ref.current.rotation.z += delta * speed * 0.3; // Constantly spin around Z
+      ref.current.rotation.y += delta * speed * 0.1;
+      
+      const intensity = cpuUsage > 50 ? (cpuUsage - 50) / 10 : 1; 
+      const pulse = Math.sin(state.clock.elapsedTime * 3) * 0.05 * intensity;
+      
+      // We apply the spring scale base, then add the frame-by-frame pulse manually
+      const currentScale = scaleSpring.get() + pulse;
+      ref.current.scale.set(currentScale, currentScale, currentScale);
+    }
   });
 
   return (
-    <Icosahedron args={[1, 1]} ref={ref}>
-      <meshBasicMaterial color={color} transparent opacity={0.1} wireframe={false} />
-      <Edges scale={1.05} threshold={15} color={color} />
-    </Icosahedron>
+    <a.group rotation={rotation}>
+      <Icosahedron args={[1, 1]} ref={ref}>
+        <meshBasicMaterial color={color} transparent opacity={0.1} wireframe={false} />
+        <Edges scale={1.05} threshold={15} color={color} />
+      </Icosahedron>
+    </a.group>
   );
 }
 

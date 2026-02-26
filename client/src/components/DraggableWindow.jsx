@@ -31,6 +31,14 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
             dragHandleClassName="window-header"
             onDragStart={() => setActiveAppId(app.id)}
             onResizeStart={() => setActiveAppId(app.id)}
+            onDrag={(e, d) => {
+                // If updateAppState supports updating transient state, or we pass a callback for global dragging
+                if (typeof window !== 'undefined') {
+                    // Dispatch a custom event for the 3D scene to pick up without heavy re-renders
+                    const dragEvent = new CustomEvent('window-drag', { detail: { x: d.x, y: d.y, id: app.id } });
+                    window.dispatchEvent(dragEvent);
+                }
+            }}
             style={{
                 zIndex: activeAppId === app.id ? 2000 : 1000,
                 display: app.isMinimized ? 'none' : 'flex',
