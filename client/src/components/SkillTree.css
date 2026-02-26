@@ -1,0 +1,39 @@
+.skill-tree-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+    background: transparent;
+}
+
+.st-header {
+    background: rgba(10, 10, 10, 0.8);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10;
+}
+
+.st-header h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #fff;
+    text-shadow: 2px 0 0 rgba(255, 0, 0, 0.6), -2px 0 0 rgba(0, 255, 255, 0.6);
+}
+
+.st-header p {
+    margin: 0;
+    color: #888;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+}
+
+.st-graph-wrapper {
+    flex: 1;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.4);
+    cursor: default;
+}
