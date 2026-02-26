@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Rnd } from 'react-rnd';
 import Terminal from '../Terminal';
+
+const CommandCenter = lazy(() => import('./CommandCenter'));
+const SkillTree = lazy(() => import('./SkillTree'));
 
 const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handleMinimize, handleMaximize, updateAppState }) => {
     
@@ -67,7 +70,10 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
                         <span className="control maximize" onClick={(e) => handleMaximize(e, app.id)}></span>
                     </div>
                     <div className="window-title">
-                        {app.id === 'terminal' ? 'visitor@rauneet-dev: ~' : `${app.name} — Preview Mode`}
+                        {app.id === 'terminal' ? 'visitor@rauneet-dev: ~' : 
+                         app.id === 'command-center' ? 'root@TELEMETRY' :
+                         app.id === 'skill-tree' ? 'root@NEURAL_NET' :
+                         `${app.name} — Preview Mode`}
                     </div>
                     <div className="window-actions">
                         <span>▼</span>
@@ -76,6 +82,14 @@ const DraggableWindow = ({ app, activeAppId, setActiveAppId, handleClose, handle
 
                 {app.id === 'terminal' ? (
                     <Terminal onClose={() => handleClose(app.id)} isMinimized={app.isMinimized} />
+                ) : app.id === 'command-center' ? (
+                    <Suspense fallback={<div style={{padding:'2rem', color:'#fff'}}>Loading Telemetry...</div>}>
+                        <CommandCenter />
+                    </Suspense>
+                ) : app.id === 'skill-tree' ? (
+                    <Suspense fallback={<div style={{padding:'2rem', color:'#fff'}}>Loading Neural Pathways...</div>}>
+                        <SkillTree />
+                    </Suspense>
                 ) : (
                     <div className="window-body">
                         <div className="window-sidebar">

@@ -6,6 +6,7 @@ const DraggableWindow = React.lazy(() => import('./components/DraggableWindow'))
 const BackgroundScene = React.lazy(() => import('./components/BackgroundScene'));
 import BootSequence from './components/BootSequence';
 import CustomCursor from './components/CustomCursor';
+import SystemNotifications, { notify } from './components/SystemNotifications';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
@@ -27,6 +28,11 @@ function App() {
     // Check if already open
     const isAlreadyOpen = openApps.find(app => app.id === tech.id);
     
+    // Notification achievement!
+    if (!openApps.find(app => app.id === tech.id) && openApps.length === 2) {
+      notify('ACHIEVEMENT: User explored multiple project modules!', 'achievement');
+    }
+
     if (isAlreadyOpen) {
       // Bring to front and unminimize
       updateAppState(tech.id, { isMinimized: false });
@@ -45,27 +51,29 @@ function App() {
     }
   };
 
-  const openTerminal = () => {
-    const terminalId = 'terminal';
-    const isAlreadyOpen = openApps.find(app => app.id === terminalId);
-
+  const openAppById = (id, title, color) => {
+    const isAlreadyOpen = openApps.find(app => app.id === id);
     if (isAlreadyOpen) {
-        updateAppState(terminalId, { isMinimized: false });
-        setActiveAppId(terminalId);
+        updateAppState(id, { isMinimized: false });
+        setActiveAppId(id);
     } else {
-        const terminalApp = {
-            id: 'terminal',
-            name: 'Terminal',
-            icon: 'terminal-icon', // Marker for inline SVG
-            color: '#33ff33', // Traditional terminal green
+        const customApp = {
+            id,
+            name: title,
+            icon: id + '-icon', 
+            color,
             isMinimized: false,
-            isMaximized: false,
-            activeTab: 'cli' // Special tab identifier
+            isMaximized: false
         };
-        setOpenApps([...openApps, terminalApp]);
-        setActiveAppId(terminalId);
+        setOpenApps([...openApps, customApp]);
+        setActiveAppId(id);
+        if (id === 'skill-tree') notify('TIP: Zoom and drag the nodes to explore.', 'info');
     }
   };
+
+  const openTerminal = () => openAppById('terminal', 'Terminal', '#33ff33');
+  const openCommandCenter = () => openAppById('command-center', 'Command Center', '#ffbd2e');
+  const openSkillTree = () => openAppById('skill-tree', 'Skill Tree', '#00ff80');
 
   const handleClose = (appId) => {
     setOpenApps(openApps.filter(app => app.id !== appId));
@@ -165,6 +173,7 @@ function App() {
   return (
     <div className={`app-container ${theme === 'light' ? 'light-theme' : ''}`}>
       <CustomCursor theme={theme} />
+      <SystemNotifications />
       {!hasBooted && <BootSequence onComplete={() => setHasBooted(true)} />}
 
       {/* 3D Interactive Background */}
@@ -324,24 +333,47 @@ function App() {
                       <polyline points="4 17 10 11 4 5"></polyline>
                       <line x1="12" y1="19" x2="20" y2="19"></line>
                    </svg>
+               ) : app.icon === 'command-center-icon' ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dock-icon">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="3" y1="9" x2="21" y2="9"></line>
+                      <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+               ) : app.icon === 'skill-tree-icon' ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dock-icon">
+                      <circle cx="18" cy="18" r="3"></circle>
+                      <circle cx="6" cy="6" r="3"></circle>
+                      <circle cx="18" cy="6" r="3"></circle>
+                      <path d="M15.4 15.4l-6.8-6.8"></path>
+                    </svg>
                ) : (
                    <img src={app.icon} alt={app.name} className="dock-icon" />
                )}
                {!app.isMinimized && <div className="dock-dot"></div>}
             </div>
           ))}
-          {/* Always show Terminal in Dock if not open? Or maybe just a launcher button if we prefer. 
-              Let's add a permanent launcher for Terminal if it's not active? 
-              Actually, usually standard docks show pinned apps. Let's just add a launcher button 
-              that isn't part of openApps unless it IS open. But to keep it simple, let's 
-              add a standalone trigger in the dock for "New Terminal" if not present.
-           */}
+           {/* Always show custom launchers in dock if not open */}
+           {!openApps.find(a => a.id === 'skill-tree') && (
+               <div className="dock-item" onClick={openSkillTree} title="Skill Tree">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dock-icon">
+                      <circle cx="18" cy="18" r="3"></circle>
+                      <circle cx="6" cy="6" r="3"></circle>
+                      <circle cx="18" cy="6" r="3"></circle>
+                      <path d="M15.4 15.4l-6.8-6.8"></path>
+                    </svg>
+               </div>
+           )}
+           {!openApps.find(a => a.id === 'command-center') && (
+               <div className="dock-item" onClick={openCommandCenter} title="Command Center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dock-icon">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="3" y1="9" x2="21" y2="9"></line>
+                      <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+               </div>
+           )}
            {!openApps.find(a => a.id === 'terminal') && (
-               <div 
-                className="dock-item"
-                onClick={openTerminal}
-                title="Open Terminal"
-               >
+               <div className="dock-item" onClick={openTerminal} title="Open Terminal">
                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dock-icon">
                       <polyline points="4 17 10 11 4 5"></polyline>
                       <line x1="12" y1="19" x2="20" y2="19"></line>
