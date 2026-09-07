@@ -1,0 +1,258 @@
+.pipeline-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #0d1117;
+  color: #c9d1d9;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  overflow: hidden;
+}
+
+.pipeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+}
+
+.pipeline-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.jenkins-icon-badge {
+  background: #d33833;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pipeline-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.trigger-run-btn {
+  background: #238636;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.trigger-run-btn:hover:not(:disabled) {
+  background: #2ea043;
+}
+
+.trigger-run-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.gh-pr-link-btn {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #58a6ff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.gh-pr-link-btn:hover {
+  background: #30363d;
+  color: #79c0ff;
+}
+
+/* Pipeline Stages Rail */
+.pipeline-stages-rail {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: #11151c;
+  border-bottom: 1px solid #30363d;
+  overflow-x: auto;
+  gap: 8px;
+}
+
+.stage-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 170px;
+}
+
+.stage-card:hover {
+  border-color: #58a6ff;
+  background: #1c2128;
+}
+
+.stage-card.active {
+  border-color: #2ea043;
+  background: #1f2824;
+  box-shadow: 0 0 12px rgba(46, 160, 67, 0.2);
+}
+
+.stage-card.running {
+  border-color: #d29922;
+  background: #232014;
+  animation: pulse-border 1.5s infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: #d29922; }
+  50% { border-color: #e3b341; }
+}
+
+.stage-icon-status {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.stage-icon-status.passed {
+  background: rgba(46, 160, 67, 0.2);
+  color: #3fb950;
+  border: 1px solid #2ea043;
+}
+
+.stage-icon-status.running {
+  background: rgba(210, 153, 34, 0.2);
+  color: #d29922;
+  border: 1px solid #d29922;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.stage-icon-status.pending {
+  background: rgba(110, 118, 129, 0.2);
+  color: #8b949e;
+  border: 1px solid #30363d;
+}
+
+.stage-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stage-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f0f6fc;
+}
+
+.stage-meta {
+  font-size: 0.7rem;
+  color: #8b949e;
+}
+
+.stage-connector {
+  width: 24px;
+  height: 2px;
+  background: #30363d;
+}
+
+/* Console Logs View */
+.pipeline-logs-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #090d13;
+}
+
+.logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  font-size: 0.75rem;
+  color: #8b949e;
+}
+
+.logs-body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.log-line {
+  font-family: inherit;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.log-line.cmd {
+  color: #58a6ff;
+  font-weight: 600;
+}
+
+.log-line.pass {
+  color: #3fb950;
+}
+
+.log-line.info {
+  color: #8b949e;
+}
+
+.log-line.highlight {
+  color: #e3b341;
+}
+
+/* PR Spotlight Banner */
+.jenkins-pr-spotlight {
+  padding: 12px 20px;
+  background: #1a1721;
+  border-top: 1px solid #3a2e4c;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+}
+
+.spotlight-text {
+  color: #d2a8ff;
+}
+
+.spotlight-author {
+  color: #8b949e;
+}
