@@ -1,495 +1,468 @@
-import React, { useState, useEffect } from 'react';
-import { techData, personalInfo } from './data';
-import { playHoverSound, playClickSound, toggleSound, isSoundEnabled } from './utils/sound';
+import React, { useState } from 'react';
+import { personalInfo, techData, skillsData } from './data';
+import { playClickSound, playSuccessSound } from './utils/sound';
 
-const DraggableWindow = React.lazy(() => import('./components/DraggableWindow'));
-const BackgroundScene = React.lazy(() => import('./components/BackgroundScene'));
-import BootSequence from './components/BootSequence';
-import CustomCursor from './components/CustomCursor';
-import SystemNotifications, { notify } from './components/SystemNotifications';
+import ApiExplorer from './components/ApiExplorer';
+import SystemArchitecture from './components/SystemArchitecture';
+import PipelineVisualizer from './components/PipelineVisualizer';
+import Terminal from './Terminal';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import './App.css';
 
 function App() {
-  const [openApps, setOpenApps] = useState([]);
-  const [activeAppId, setActiveAppId] = useState(null);
-  const [hasBooted, setHasBooted] = useState(false);
-  const [soundOn, setSoundOn] = useState(true);
-
+  const [activeSuiteTab, setActiveSuiteTab] = useState('api');
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [theme, setTheme] = useState('dark');
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const toggleTheme = () => {
+  const handleTabChange = (tab) => {
     playClickSound();
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    setActiveSuiteTab(tab);
   };
 
-  const handleToggleSound = () => {
-    const res = toggleSound();
-    setSoundOn(res);
-    if (res) playClickSound();
-  };
-
-  const handleTechClick = (tech) => {
+  const copyEmail = () => {
     playClickSound();
-    const isAlreadyOpen = openApps.find(app => app.id === tech.id);
-    
-    if (!isAlreadyOpen && openApps.length === 2) {
-      notify('ACHIEVEMENT: Inspected multiple backend architectural tiers!', 'achievement');
-    }
-
-    if (isAlreadyOpen) {
-      updateAppState(tech.id, { isMinimized: false });
-      setActiveAppId(tech.id);
-    } else {
-      const newApp = { 
-        ...tech, 
-        instanceId: Date.now(), 
-        isMinimized: false,
-        isMaximized: false,
-        activeTab: 'projects' 
-      };
-      setOpenApps([...openApps, newApp]);
-      setActiveAppId(tech.id);
-    }
+    navigator.clipboard.writeText(personalInfo.email);
+    setCopied(true);
+    playSuccessSound();
+    setTimeout(() => setCopied(false), 2500);
   };
 
-  const openAppById = (id, title, color) => {
+  const handlePrintResume = () => {
     playClickSound();
-    const isAlreadyOpen = openApps.find(app => app.id === id);
-    if (isAlreadyOpen) {
-        updateAppState(id, { isMinimized: false });
-        setActiveAppId(id);
-    } else {
-        const customApp = {
-            id,
-            name: title,
-            icon: id + '-icon', 
-            color,
-            isMinimized: false,
-            isMaximized: false
-        };
-        setOpenApps([...openApps, customApp]);
-        setActiveAppId(id);
-        if (id === 'api-explorer') notify('TIP: Click "Send Request" to test live API responses.', 'info');
-        if (id === 'pipeline') notify('TIP: Click "Trigger Pipeline Run" to simulate Jenkins CI/CD.', 'info');
-    }
+    window.print();
   };
-
-  const openTerminal = () => openAppById('terminal', 'DevOps Terminal', '#33ff33');
-  const openCommandCenter = () => openAppById('command-center', 'Cluster Telemetry', '#ffbd2e');
-  const openSkillTree = () => openAppById('skill-tree', 'Skill Graph', '#00ff80');
-  const openApiExplorer = () => openAppById('api-explorer', 'REST API Sandbox', '#2ea043');
-  const openArchitecture = () => openAppById('architecture', 'System Blueprint', '#0284c7');
-  const openPipeline = () => openAppById('pipeline', 'Jenkins CI/CD Pipeline', '#d33833');
-  const openRecruiter = () => openAppById('recruiter', 'Recruiter Fast-Track', '#38bdf8');
-
-  const handleClose = (appId) => {
-    playClickSound();
-    setOpenApps(openApps.filter(app => app.id !== appId));
-    if (activeAppId === appId) {
-      setActiveAppId(null);
-    }
-  };
-
-  const handleMinimize = (e, appId) => {
-    e.stopPropagation();
-    playClickSound();
-    updateAppState(appId, { isMinimized: true });
-    if (activeAppId === appId) {
-      setActiveAppId(null);
-    }
-  };
-
-  const handleMaximize = (e, appId) => {
-    if (e) e.stopPropagation();
-    playClickSound();
-    const app = openApps.find(a => a.id === appId);
-    if (!app) return;
-    updateAppState(appId, { isMaximized: !app.isMaximized, isMinimized: false });
-    setActiveAppId(appId);
-  };
-
-  const handleDockClick = (appId) => {
-    playClickSound();
-    const app = openApps.find(a => a.id === appId);
-    if (!app) return;
-
-    if (app.isMinimized || activeAppId !== appId) {
-      updateAppState(appId, { isMinimized: false });
-      setActiveAppId(appId);
-    } else {
-      updateAppState(appId, { isMinimized: true });
-      setActiveAppId(null);
-    }
-  };
-
-  const updateAppState = (appId, updates) => {
-    setOpenApps(prev => prev.map(app => 
-      app.id === appId ? { ...app, ...updates } : app
-    ));
-  };
-  
-  // Scroll to Top Logic
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    playClickSound();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Close active window with Escape
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') {
-        if (activeAppId) handleClose(activeAppId);
-        if (isContactOpen) setIsContactOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [activeAppId, isContactOpen]);
-
-  // Status Bar Logic
-  const [time, setTime] = useState(new Date());
-  const [cpuUsage, setCpuUsage] = useState(14);
-
-  useEffect(() => {
-    const timeInterval = setInterval(() => setTime(new Date()), 1000);
-    const cpuInterval = setInterval(() => {
-      setCpuUsage(prev => Math.min(100, Math.max(5, prev + (Math.random() - 0.5) * 8)));
-    }, 2000);
-    return () => {
-      clearInterval(timeInterval);
-      clearInterval(cpuInterval);
-    };
-  }, []);
 
   return (
-    <div className={`app-container ${theme === 'light' ? 'light-theme' : ''}`}>
-      <CustomCursor theme={theme} />
-      <SystemNotifications />
-      {!hasBooted && <BootSequence onComplete={() => setHasBooted(true)} />}
+    <div className="site-wrapper">
+      {/* Ambient Lighting & Grid */}
+      <div className="ambient-glow-wrapper">
+        <div className="ambient-glow-1"></div>
+        <div className="ambient-glow-2"></div>
+        <div className="ambient-grid"></div>
+      </div>
 
-      {/* 3D Interactive Background */}
-      <React.Suspense fallback={<div className="scene-fallback" style={{ background: theme === 'light' ? '#f5f5f7' : '#050505', position: 'fixed', inset: 0, zIndex: -1 }} />}>
-        <BackgroundScene theme={theme} cpuUsage={cpuUsage} />
-      </React.Suspense>
+      {/* Navigation Bar */}
+      <nav className="site-nav">
+        <a href="#overview" className="nav-brand" onClick={playClickSound}>
+          <div className="brand-avatar">RS</div>
+          <span className="brand-name">{personalInfo.name}</span>
+          <span className="brand-role-pill">Backend &amp; DevOps</span>
+        </a>
 
-      {/* Top Status Bar */}
-      <header className="status-bar">
-        <div className="status-left">
-          <span className="status-name">{personalInfo.name}</span>
-          <span className="status-item role-tag">Backend &amp; DevOps Engineer</span>
-          <span className="status-item jenkins-tag">Jenkins Core PR #26966 (Merged)</span>
+        <div className="nav-links">
+          <a href="#overview" className="nav-link" onClick={playClickSound}>Overview</a>
+          <a href="#jenkins" className="nav-link" onClick={playClickSound}>Jenkins OSS</a>
+          <a href="#projects" className="nav-link" onClick={playClickSound}>Projects</a>
+          <a href="#dev-suite" className="nav-link" onClick={playClickSound}>System Suite</a>
+          <a href="#skills" className="nav-link" onClick={playClickSound}>Stack</a>
+          <a href="#about" className="nav-link" onClick={playClickSound}>About</a>
         </div>
-        <div className="status-right">
-          <div className="status-item cpu-monitor">
-            <span style={{ fontSize: '0.8em', marginRight: '5px' }}>CPU</span>
-            <div className="cpu-bar">
-              <div className="cpu-fill" style={{ width: `${cpuUsage}%` }}></div>
-            </div>
-            <span style={{ fontSize: '0.8em', width: '30px', textAlign: 'right' }}>{Math.round(cpuUsage)}%</span>
-          </div>
 
-          <button className="sound-toggle-btn" onClick={handleToggleSound} title="Toggle Synthesizer Sound">
-            {soundOn ? '🔊 Audio ON' : '🔇 Muted'}
+        <div className="nav-actions">
+          <button className="btn-nav-secondary" onClick={handlePrintResume} title="Print or Save Resume PDF">
+            <span>📄</span> Resume
           </button>
-
-          <div className="status-item clock">
-            {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </div>
-          
-          <button className="theme-toggle-btn" onClick={openRecruiter} title="Open Recruiter Fast-Track Summary">
-            👔 Recruiter Fast-Track
-          </button>
-
-          <button className="contact-btn" onClick={() => { playClickSound(); setIsContactOpen(true); }}>
-            Contact
+          <button className="btn-nav-primary" onClick={() => { playClickSound(); setIsContactOpen(true); }}>
+            Get in Touch
           </button>
         </div>
-      </header>
+      </nav>
 
-      {/* Main Content */}
-      <main className={`main-content ${activeAppId ? 'blur-background' : ''}`} style={{ paddingTop: '60px' }}>
-        <header className="hero">
-          <motion.div 
-            className="hero-content"
+      <main>
+        {/* Hero Section */}
+        <section id="overview" className="hero-section">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 0.8 }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
           >
-            <div className="hero-badge-row">
-              <span className="hero-badge jenkins">★ Jenkins Core Contributor</span>
-              <span className="hero-badge k8s">Kubernetes &amp; Docker</span>
-              <span className="hero-badge auth">Hardened REST APIs</span>
+            <div className="hero-status-pill">
+              <span className="status-dot"></span>
+              <span>Available for Backend &amp; DevOps Internships • GSoC / LFX Ready</span>
             </div>
 
-            <motion.h1 
-              className="glitch" 
-              data-text={personalInfo.name.toUpperCase()}
-              initial={{ letterSpacing: "0.2em", filter: "blur(10px)" }}
-              animate={{ letterSpacing: "0.05em", filter: "blur(0px)" }}
-              transition={{ duration: 1.5, ease: "anticipate" }}
-            >
-              {personalInfo.name.toUpperCase()}
-            </motion.h1>
+            <h1 className="hero-title">
+              Architecting Resilient <br />
+              <span className="hero-gradient-text">Backends, Containers &amp; CI/CD Pipelines.</span>
+            </h1>
 
-            <motion.p 
-              className="subtitle"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 1 }}
-            >
-              BACKEND &amp; DEVOPS ENGINEER • PLATFORM ENGINEERING
-            </motion.p>
-
-            <p className="hero-description">
-              Undergraduate engineer building production-ready REST APIs, microservice auth architectures, and containerized CI/CD systems. Merged core contribution into Jenkins Core.
+            <p className="hero-lead">
+              Computer Science undergraduate with proven experience building production-ready REST APIs, hardened authentication architectures, and containerized cloud systems. Core contributor to <strong>Jenkins Core</strong>.
             </p>
 
-            {/* Quick Action Interactive Launchers */}
-            <div className="hero-quick-launchers">
-              <button className="launcher-btn api" onClick={openApiExplorer} onMouseEnter={playHoverSound}>
-                <span className="btn-icon">⚡</span>
-                <span>REST API Sandbox</span>
-              </button>
-              <button className="launcher-btn arch" onClick={openArchitecture} onMouseEnter={playHoverSound}>
-                <span className="btn-icon">🏗️</span>
-                <span>Architecture Blueprint</span>
-              </button>
-              <button className="launcher-btn pipeline" onClick={openPipeline} onMouseEnter={playHoverSound}>
-                <span className="btn-icon">✓</span>
-                <span>Jenkins CI/CD Pipeline</span>
-              </button>
-              <button className="launcher-btn term" onClick={openTerminal} onMouseEnter={playHoverSound}>
-                <span className="btn-icon">&gt;_</span>
-                <span>DevOps Terminal</span>
+            <div className="hero-cta-group">
+              <a href="#dev-suite" className="hero-btn-primary" onClick={playClickSound}>
+                <span>⚡</span> Test Live API Sandbox
+              </a>
+              <a href="#jenkins" className="hero-btn-secondary" onClick={playClickSound}>
+                <span>✓</span> View Jenkins Core PR #26966
+              </a>
+              <button className="hero-btn-secondary" onClick={copyEmail}>
+                {copied ? '✔ Email Copied!' : '📋 Copy Email'}
               </button>
             </div>
 
-            <motion.div 
-              className="status-line"
-              initial={{ width: 0 }}
-              animate={{ width: "fit-content" }}
-              transition={{ delay: 1, duration: 0.8 }}
-              style={{ overflow: 'hidden', whiteSpace: 'nowrap', margin: '20px auto 0' }}
-            >
-              <span className="blink">_</span> CLUSTER: OPTIMAL • LATENCY: &lt;20MS • OPEN TO INTERNSHIPS
-            </motion.div>
-          </motion.div>
-        </header>
-
-        {/* Modules Section */}
-        <section className="tech-grid-section">
-          <motion.h2
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
-            // PRODUCTION_SYSTEMS_&amp;_CONTRIBUTIONS
-          </motion.h2>
-          <motion.div 
-            className="tech-grid"
-            initial="hidden"
-            animate="show"
-            variants={{
-              hidden: { opacity: 0 },
-              show: {
-                opacity: 1,
-                transition: { 
-                  staggerChildren: 0.15,
-                  delayChildren: 0.4
-                }
-              }
-            }}
-          >
-            {techData.map((tech) => (
-              <motion.button
-                key={tech.id}
-                className="tech-card"
-                onClick={() => handleTechClick(tech)}
-                onMouseEnter={playHoverSound}
-                style={{ '--tech-color': tech.color }}
-                variants={{
-                  hidden: { opacity: 0, scale: 0.8, y: 20 },
-                  show: { 
-                    opacity: 1, 
-                    scale: 1, 
-                    y: 0,
-                    transition: {
-                      type: "spring",
-                      stiffness: 100,
-                      damping: 12
-                    }
-                  }
-                }}
-                whileHover={{ 
-                  scale: 1.04, 
-                  y: -5,
-                  boxShadow: `0 0 24px -4px ${tech.color}` 
-                }}
-                whileTap={{ scale: 0.96 }}
-              >
-                <div className="card-top-badge">{tech.badge}</div>
-                <div className="tech-info" style={{ marginTop: '8px' }}>
-                  <h3>{tech.name}</h3>
-                  <span className="tech-role">{tech.role}</span>
-                  <p className="card-desc">{tech.summary}</p>
-                </div>
-                <div className="card-explore-hint">Click to inspect architectural specs →</div>
-                <div className="card-border"></div>
-              </motion.button>
-            ))}
+            {/* Key Metrics Grid */}
+            <div className="hero-metrics-grid">
+              <div className="metric-card">
+                <div className="metric-val" style={{ color: '#f87171' }}>PR #26966</div>
+                <div className="metric-label">Merged into Jenkins Core (CI/CD used by millions worldwide)</div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-val" style={{ color: '#38bdf8' }}>&lt; 25ms</div>
+                <div className="metric-label">Average API latency with Zod validation &amp; rate-limiting</div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-val" style={{ color: '#34d399' }}>JWT + RBAC</div>
+                <div className="metric-label">Stateless token architecture with bcrypt &amp; role-gated routes</div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-val" style={{ color: '#818cf8' }}>Docker + K8s</div>
+                <div className="metric-label">Multi-stage container builds &amp; rolling cloud deployments</div>
+              </div>
+            </div>
           </motion.div>
         </section>
 
-        <footer className="footer">
-          <p>© {new Date().getFullYear()} {personalInfo.name} • Backend &amp; DevOps Engineering</p>
-        </footer>
-      </main>
+        {/* Flagship Open Source: Jenkins Core */}
+        <section id="jenkins" className="section-wrapper">
+          <span className="section-tag">// GLOBAL OPEN SOURCE CONTRIBUTION</span>
+          <h2 className="section-title">Jenkins Core Contributor</h2>
+          <p className="section-desc">
+            Direct code contribution merged into Jenkins Core master branch, resolving deprecated browser execution bugs in production CI/CD platforms.
+          </p>
 
-      {/* Dock System */}
-      <div className="dock-wrapper">
-        <div className="dock">
-          {/* Always available launchers */}
-          <div className="dock-item" onClick={openRecruiter} title="Recruiter Fast-Track">
-            <span style={{ fontSize: '1.2rem' }}>👔</span>
-            <span className="dock-label">Recruiter</span>
-          </div>
-          <div className="dock-item" onClick={openApiExplorer} title="REST API Sandbox">
-            <span style={{ fontSize: '1.2rem' }}>⚡</span>
-            <span className="dock-label">API Sandbox</span>
-          </div>
-          <div className="dock-item" onClick={openArchitecture} title="System Architecture">
-            <span style={{ fontSize: '1.2rem' }}>🏗️</span>
-            <span className="dock-label">Architecture</span>
-          </div>
-          <div className="dock-item" onClick={openPipeline} title="Jenkins CI/CD Pipeline">
-            <span style={{ fontSize: '1.2rem' }}>✓</span>
-            <span className="dock-label">CI/CD</span>
-          </div>
-          <div className="dock-item" onClick={openTerminal} title="DevOps Terminal">
-            <span style={{ fontSize: '1.2rem' }}>&gt;_</span>
-            <span className="dock-label">Terminal</span>
-          </div>
-          <div className="dock-item" onClick={openCommandCenter} title="Cluster Telemetry">
-            <span style={{ fontSize: '1.2rem' }}>📊</span>
-            <span className="dock-label">Telemetry</span>
-          </div>
-          <div className="dock-item" onClick={openSkillTree} title="Skill Graph">
-            <span style={{ fontSize: '1.2rem' }}>🕸️</span>
-            <span className="dock-label">Skills</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Windows Layer */}
-      <React.Suspense fallback={null}>
-        {openApps.map((app) => (
-          <DraggableWindow 
-              key={app.id}
-              app={app}
-              activeAppId={activeAppId}
-              setActiveAppId={setActiveAppId}
-              handleClose={handleClose}
-              handleMinimize={handleMinimize}
-              handleMaximize={handleMaximize}
-              openTerminal={openTerminal}
-              updateAppState={updateAppState}
-              techData={techData}
-          />
-        ))}
-      </React.Suspense>
-
-      {/* Contact Modal */}
-      {isContactOpen && (
-        <div className="modal-overlay" onClick={() => setIsContactOpen(false)}>
-          <div className="contact-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>// INITIALIZE_COMMUNICATIONS</h3>
-              <button className="close-btn" onClick={() => { playClickSound(); setIsContactOpen(false); }}>×</button>
+          <div className="jenkins-spotlight-card">
+            <div className="jenkins-badge-row">
+              <div className="jenkins-logo-pill">
+                <span>⚡</span> JENKINS CORE
+              </div>
+              <div className="pr-status-badge">
+                <span>✓</span> STATUS: MERGED TO MASTER
+              </div>
             </div>
-            <div className="modal-body">
-              <p className="terminal-text">
-                &gt; Systems ready.<br/>
-                &gt; Candidate open to Backend / DevOps / Platform Engineering roles.
-              </p>
-              
-              <div className="contact-grid">
-                <a href={`mailto:${personalInfo.email}`} className="contact-item">
-                  <span className="icon">✉</span>
-                  <div className="info">
-                    <span className="label">Direct Email</span>
-                    <span className="value">{personalInfo.email}</span>
-                  </div>
-                </a>
-                
-                <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-item">
-                  <span className="icon">🐙</span>
-                  <div className="info">
-                    <span className="label">GitHub</span>
-                    <span className="value">@Rauneet-coder</span>
-                  </div>
-                </a>
- 
-                <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="contact-item">
-                  <span className="icon">💼</span>
-                  <div className="info">
-                    <span className="label">LinkedIn</span>
-                    <span className="value">linkedin.com/in/rauneet-singh-85369428b</span>
-                  </div>
-                </a>
 
-                <div className="contact-item" style={{ cursor: 'default' }}>
-                  <span className="icon">📍</span>
-                  <div className="info">
-                    <span className="label">Location &amp; Availability</span>
-                    <span className="value">{personalInfo.location} • GSoC / LFX Ready</span>
+            <div className="jenkins-content-grid">
+              <div className="jenkins-details">
+                <h3>Resolve Deprecated window.event Reliance (PR #26966)</h3>
+                <p>
+                  Identified and resolved a critical cross-browser event handling defect caused by reliance on legacy <code>window.event</code>, eliminating a silent failure path in production codebases serving millions of automated pipelines.
+                </p>
+
+                <ul className="impact-bullet-list">
+                  <li>
+                    <span className="bullet-icon">▸</span>
+                    <span><strong>Root Cause Resolution:</strong> Re-engineered legacy event delegation to pass standard event references explicitly without breaking backward compatibility.</span>
+                  </li>
+                  <li>
+                    <span className="bullet-icon">▸</span>
+                    <span><strong>Collaborative Review:</strong> Navigated multi-round code reviews directly with Jenkins Core maintainers, incorporating technical feedback.</span>
+                  </li>
+                  <li>
+                    <span className="bullet-icon">▸</span>
+                    <span><strong>CI Validation:</strong> Passed Jenkins comprehensive automated CI validation test suites end-to-end before merging.</span>
+                  </li>
+                </ul>
+
+                <a
+                  href="https://github.com/jenkinsci/jenkins/pull/26966"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="jenkins-pr-btn"
+                >
+                  Inspect Pull Request #26966 on GitHub ↗
+                </a>
+              </div>
+
+              <div className="jenkins-code-preview">
+                <div className="code-preview-topbar">
+                  <span>jenkinsci/jenkins • diff</span>
+                  <span>PR #26966</span>
+                </div>
+                <pre className="code-pre">
+<span className="diff-del">- // Deprecated global event reliance</span>
+<span className="diff-del">- const evt = window.event;</span>
+<span className="diff-del">- handlePipelineTrigger(evt.target);</span>
+<br />
+<span className="diff-add">+ // Modern event parameter passing</span>
+<span className="diff-add">+ const handleTrigger = (event) =&gt; &#123;</span>
+<span className="diff-add">+   const target = event?.target || event?.srcElement;</span>
+<span className="diff-add">+   dispatchPipelineAction(target);</span>
+<span className="diff-add">+ &#125;;</span>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Interactive Developer Suite (Mobbin Tabbed Component) */}
+        <section id="dev-suite" className="section-wrapper">
+          <span className="section-tag">// LIVE SYSTEM CONSOLE</span>
+          <h2 className="section-title">Interactive Backend &amp; DevOps Suite</h2>
+          <p className="section-desc">
+            Directly test API endpoints, inspect microservice architecture flows, trigger CI/CD pipelines, and query system telemetry right in your browser.
+          </p>
+
+          <div className="dev-suite-wrapper">
+            {/* Tab Navigation */}
+            <div className="suite-tab-bar">
+              <button
+                className={`suite-tab-btn ${activeSuiteTab === 'api' ? 'active' : ''}`}
+                onClick={() => handleTabChange('api')}
+              >
+                <span>⚡</span> REST API Sandbox
+                <span className="tab-badge">Live</span>
+              </button>
+              <button
+                className={`suite-tab-btn ${activeSuiteTab === 'arch' ? 'active' : ''}`}
+                onClick={() => handleTabChange('arch')}
+              >
+                <span>🏗️</span> System Architecture
+                <span className="tab-badge">Blueprint</span>
+              </button>
+              <button
+                className={`suite-tab-btn ${activeSuiteTab === 'pipeline' ? 'active' : ''}`}
+                onClick={() => handleTabChange('pipeline')}
+              >
+                <span>✓</span> CI/CD Pipeline
+                <span className="tab-badge">Jenkins</span>
+              </button>
+              <button
+                className={`suite-tab-btn ${activeSuiteTab === 'terminal' ? 'active' : ''}`}
+                onClick={() => handleTabChange('terminal')}
+              >
+                <span>&gt;_</span> DevOps CLI
+                <span className="tab-badge">Linux</span>
+              </button>
+            </div>
+
+            {/* Tabbed Content Area */}
+            <div className="suite-content-area">
+              {activeSuiteTab === 'api' && <ApiExplorer />}
+              {activeSuiteTab === 'arch' && <SystemArchitecture />}
+              {activeSuiteTab === 'pipeline' && <PipelineVisualizer />}
+              {activeSuiteTab === 'terminal' && <Terminal onClose={() => setActiveSuiteTab('api')} isMinimized={false} />}
+            </div>
+          </div>
+        </section>
+
+        {/* Production Projects Showcase */}
+        <section id="projects" className="section-wrapper">
+          <span className="section-tag">// PRODUCTION ARCHITECTURES</span>
+          <h2 className="section-title">Featured Engineering Work</h2>
+          <p className="section-desc">
+            Production-ready backend services designed with clean architecture, defensive security, and scalable data models.
+          </p>
+
+          <div className="projects-showcase-grid">
+            {techData.map((project) => (
+              <div key={project.id} className="project-item-card">
+                <div className="card-top-meta">
+                  <span className="card-category-badge">{project.category}</span>
+                  <span className="card-year">{project.badge}</span>
+                </div>
+
+                <h3 className="project-title">{project.name}</h3>
+                <p className="project-desc">{project.summary}</p>
+
+                {project.projects && project.projects[0]?.deepDive && (
+                  <div className="project-deepdive-box">
+                    <div className="dd-row">
+                      <span className="dd-k challenge">CHALLENGE:</span>
+                      <span style={{ color: '#94a3b8' }}>{project.projects[0].deepDive.challenge}</span>
+                    </div>
+                    <div className="dd-row">
+                      <span className="dd-k solution">SOLUTION:</span>
+                      <span style={{ color: '#94a3b8' }}>{project.projects[0].deepDive.solution}</span>
+                    </div>
+                    <div className="dd-row">
+                      <span className="dd-k impact">IMPACT:</span>
+                      <span style={{ color: '#94a3b8' }}>{project.projects[0].deepDive.impact}</span>
+                    </div>
                   </div>
+                )}
+
+                <div className="project-tech-tags">
+                  {project.stack.map(tech => (
+                    <span key={tech} className="tech-tag">{tech}</span>
+                  ))}
                 </div>
               </div>
- 
-              <div className="modal-footer">
-                <div className="status-indicator online"></div>
-                <span>Direct Dispatch Active</span>
+            ))}
+          </div>
+        </section>
+
+        {/* Technical Skills Bento Grid */}
+        <section id="skills" className="section-wrapper">
+          <span className="section-tag">// TECHNICAL ARSENAL</span>
+          <h2 className="section-title">Skills &amp; Technology Matrix</h2>
+          <p className="section-desc">
+            Technologies and tools deployed across production backends, container orchestration, and continuous integration pipelines.
+          </p>
+
+          <div className="bento-skills-grid">
+            {/* Backend Core */}
+            <div className="bento-card col-6">
+              <h3 className="bento-card-title">Backend Architecture</h3>
+              <div className="bento-card-subtitle">REST APIs, Authentication, Validation &amp; MVC Design</div>
+              <div className="skill-pills-wrap">
+                {skillsData.backend.map(s => (
+                  <div key={s.name} className="skill-pill">
+                    <span>{s.name}</span>
+                    <span className="skill-level-tag">{s.level}</span>
+                  </div>
+                ))}
               </div>
+            </div>
+
+            {/* DevOps & Cloud */}
+            <div className="bento-card col-6">
+              <h3 className="bento-card-title">DevOps &amp; Infrastructure</h3>
+              <div className="bento-card-subtitle">Containerization, CI/CD Automation &amp; Linux Environments</div>
+              <div className="skill-pills-wrap">
+                {skillsData.devops.map(s => (
+                  <div key={s.name} className="skill-pill">
+                    <span>{s.name}</span>
+                    <span className="skill-level-tag">{s.level}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Databases */}
+            <div className="bento-card col-6">
+              <h3 className="bento-card-title">Database Engineering</h3>
+              <div className="bento-card-subtitle">Document &amp; Relational Persistence, Modeling &amp; ORMs</div>
+              <div className="skill-pills-wrap">
+                {skillsData.databases.map(s => (
+                  <div key={s.name} className="skill-pill">
+                    <span>{s.name}</span>
+                    <span className="skill-level-tag">{s.level}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Languages & Workflow */}
+            <div className="bento-card col-6">
+              <h3 className="bento-card-title">Languages &amp; Tooling</h3>
+              <div className="bento-card-subtitle">Programming, Scripting, Version Control &amp; Testing</div>
+              <div className="skill-pills-wrap">
+                {skillsData.languages.map(s => (
+                  <div key={s.name} className="skill-pill">
+                    <span>{s.name}</span>
+                    <span className="skill-level-tag">{s.level}</span>
+                  </div>
+                ))}
+                {skillsData.tools.map(s => (
+                  <div key={s.name} className="skill-pill">
+                    <span>{s.name}</span>
+                    <span className="skill-level-tag">{s.level}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Education & Open-Source Readiness */}
+        <section id="about" className="section-wrapper">
+          <span className="section-tag">// ACADEMICS &amp; ASPIRATIONS</span>
+          <h2 className="section-title">Education &amp; Program Readiness</h2>
+
+          <div className="edu-oss-card">
+            <div className="edu-main">
+              <h3>{personalInfo.education.degree}</h3>
+              <p>{personalInfo.education.institution} • {personalInfo.education.affiliate}</p>
+              <div className="edu-oss-badges">
+                <span className="oss-program-tag">🎓 2nd Year ({personalInfo.education.period})</span>
+                <span className="oss-program-tag">🌐 Open Source Programs: GSoC • LFX • Outreachy</span>
+                <span className="oss-program-tag">🚀 Ready for Backend / Platform Internships</span>
+              </div>
+            </div>
+
+            <button className="btn-nav-primary" onClick={() => { playClickSound(); setIsContactOpen(true); }}>
+              Initiate Contact
+            </button>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="site-footer">
+        <div className="footer-content">
+          <div className="footer-brand">
+            © {new Date().getFullYear()} {personalInfo.name}. Engineered with precision.
+          </div>
+
+          <div className="footer-links">
+            <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
+            <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="footer-link">LinkedIn</a>
+            <a href={`mailto:${personalInfo.email}`} className="footer-link">Email</a>
+            <button className="footer-link" onClick={handlePrintResume} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+              Print Resume
+            </button>
+          </div>
+        </div>
+      </footer>
+
+      {/* Contact Drawer / Modal */}
+      {isContactOpen && (
+        <div className="contact-modal-backdrop" onClick={() => setIsContactOpen(false)}>
+          <div className="contact-modal-card" onClick={e => e.stopPropagation()}>
+            <div className="contact-modal-header">
+              <h3 className="contact-modal-title">Get in Touch with Rauneet</h3>
+              <button className="modal-close-btn" onClick={() => setIsContactOpen(false)}>×</button>
+            </div>
+
+            <p style={{ color: '#94a3b8', fontSize: '0.88rem', lineHeight: '1.5', marginBottom: '20px' }}>
+              I am actively seeking <strong>Backend Developer</strong>, <strong>DevOps</strong>, and <strong>Platform Engineering</strong> internships and open-source opportunities.
+            </p>
+
+            <div className="contact-channels">
+              <a href={`mailto:${personalInfo.email}`} className="contact-channel-item">
+                <span className="channel-icon">✉</span>
+                <div className="channel-info">
+                  <span className="channel-label">Email</span>
+                  <span className="channel-val">{personalInfo.email}</span>
+                </div>
+              </a>
+
+              <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="contact-channel-item">
+                <span className="channel-icon">💼</span>
+                <div className="channel-info">
+                  <span className="channel-label">LinkedIn</span>
+                  <span className="channel-val">linkedin.com/in/rauneet-singh-85369428b</span>
+                </div>
+              </a>
+
+              <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-channel-item">
+                <span className="channel-icon">🐙</span>
+                <div className="channel-info">
+                  <span className="channel-label">GitHub</span>
+                  <span className="channel-val">github.com/Rauneet-coder</span>
+                </div>
+              </a>
+
+              <div className="contact-channel-item" style={{ cursor: 'default' }}>
+                <span className="channel-icon">📍</span>
+                <div className="channel-info">
+                  <span className="channel-label">Location</span>
+                  <span className="channel-val">{personalInfo.location}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+              <button className="btn-nav-primary" style={{ flex: 1, justifyContent: 'center' }} onClick={copyEmail}>
+                {copied ? '✔ Email Copied to Clipboard!' : '📋 Copy Direct Email'}
+              </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Scroll to Top Button */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            className="scroll-top-btn"
-            onClick={scrollToTop}
-            initial={{ opacity: 0, scale: 0.5, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.5, y: 20 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            title="Scroll to Top"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="18 15 12 9 6 15"></polyline>
-            </svg>
-          </motion.button>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
