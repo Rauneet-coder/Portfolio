@@ -220,7 +220,7 @@
 /* Base Layout & Animations */
 .app-container {
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   position: relative;
   overflow-x: hidden;
   background-color: var(--bg-color);
@@ -408,7 +408,7 @@
   position: fixed !important;
   top: 32px !important;
   left: 0 !important;
-  width: 100vw !important;
+  width: 100% !important;
   height: calc(100vh - 32px) !important;
   transform: none !important;
   z-index: 2500 !important;
@@ -1449,4 +1449,182 @@
 .light-theme .scroll-top-btn {
   color: #fff;
   box-shadow: 0 4px 15px rgba(0, 102, 204, 0.2);
+}
+
+/* Backend & DevOps Enhancement Styles */
+.role-tag {
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.jenkins-tag {
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.sound-toggle-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #c9d1d9;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.sound-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.hero-badge-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.hero-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.hero-badge.jenkins {
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+}
+
+.hero-badge.k8s {
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.4);
+}
+
+.hero-badge.auth {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.hero-description {
+  max-width: 650px;
+  margin: 14px auto 20px;
+  font-size: 0.95rem;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.hero-quick-launchers {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px auto;
+  max-width: 800px;
+}
+
+.launcher-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(22, 27, 34, 0.85);
+  border: 1px solid #30363d;
+  color: #f0f6fc;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.launcher-btn:hover {
+  transform: translateY(-2px);
+  border-color: #58a6ff;
+  box-shadow: 0 8px 20px -4px rgba(88, 166, 255, 0.3);
+}
+
+.launcher-btn.api:hover {
+  border-color: #2ea043;
+  box-shadow: 0 8px 20px -4px rgba(46, 160, 67, 0.3);
+}
+
+.launcher-btn.arch:hover {
+  border-color: #0284c7;
+  box-shadow: 0 8px 20px -4px rgba(2, 132, 199, 0.3);
+}
+
+.launcher-btn.pipeline:hover {
+  border-color: #d33833;
+  box-shadow: 0 8px 20px -4px rgba(211, 56, 51, 0.3);
+}
+
+.card-top-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--tech-color);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--tech-color);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.card-desc {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 8px 0 12px 0;
+  text-align: left;
+}
+
+.card-explore-hint {
+  font-size: 0.72rem;
+  color: var(--tech-color);
+  font-family: 'JetBrains Mono', monospace;
+  text-align: left;
+  opacity: 0.85;
+}
+
+.dock-label {
+  position: absolute;
+  top: -28px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  color: #f0f6fc;
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.dock-item:hover .dock-label {
+  opacity: 1;
 }
