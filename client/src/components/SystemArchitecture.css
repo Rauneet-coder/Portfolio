@@ -1,0 +1,261 @@
+.sys-arch-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #090d13;
+  color: #e6edf3;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  overflow: hidden;
+}
+
+.arch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #131822;
+  border-bottom: 1px solid #232c3d;
+}
+
+.arch-title-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.arch-badge {
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.arch-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.arch-mode-btn {
+  background: #1e2638;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.arch-mode-btn:hover {
+  color: #f1f5f9;
+  border-color: #64748b;
+}
+
+.arch-mode-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+}
+
+.arch-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.arch-diagram {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* Layer rows */
+.arch-tier {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tier-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.tier-nodes {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.arch-node {
+  flex: 1;
+  min-width: 180px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.arch-node:hover {
+  transform: translateY(-2px);
+  border-color: #38bdf8;
+  box-shadow: 0 8px 20px -6px rgba(14, 165, 233, 0.25);
+}
+
+.arch-node.selected {
+  border-color: #10b981;
+  background: #132223;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.node-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.node-status {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+.node-desc {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.node-stats {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #64748b;
+  border-top: 1px dashed #232c3d;
+  padding-top: 6px;
+}
+
+.node-stat-num {
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+/* Connectors */
+.flow-arrow {
+  text-align: center;
+  color: #334155;
+  font-size: 0.85rem;
+  line-height: 1;
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.flow-pulse-line {
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, transparent, #0284c7, transparent);
+  animation: flowAnim 2s infinite linear;
+}
+
+@keyframes flowAnim {
+  0% { opacity: 0.2; transform: scaleX(0.8); }
+  50% { opacity: 1; transform: scaleX(1.05); }
+  100% { opacity: 0.2; transform: scaleX(0.8); }
+}
+
+/* Sidebar Details */
+.arch-details-panel {
+  width: 340px;
+  background: #111827;
+  border-left: 1px solid #1f2937;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.panel-section {
+  background: #0b1120;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.panel-sec-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #38bdf8;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.spec-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 4px;
+}
+
+.spec-key {
+  color: #64748b;
+}
+
+.spec-val {
+  color: #f1f5f9;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .arch-main {
+    flex-direction: column;
+  }
+  .arch-details-panel {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #1f2937;
+  }
+}
