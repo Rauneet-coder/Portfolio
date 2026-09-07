@@ -1,9 +1,13 @@
 {
-    "name": "portfolio-monorepo",
-    "private": true,
-    "scripts": {
-        "build": "npm run build --prefix client",
-        "install-client": "npm install --prefix client",
-        "dev": "npm run dev --prefix client"
-    }
+  "name": "portfolio-monorepo",
+  "private": true,
+  "workspaces": [
+    "client"
+  ],
+  "scripts": {
+    "build": "npm run build --prefix client",
+    "postinstall": "npm install --prefix client",
+    "install:client": "npm install --prefix client",
+    "dev": "npm run dev --prefix client"
+  }
 }
